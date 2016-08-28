@@ -1,0 +1,27 @@
+name:                naive-bayes
+version:             0.1
+synopsis:            Barebones implementation of unsupervised naive bayes
+-- description:         
+license:             BSD3
+license-file:        LICENSE
+author:              Rob Zinkov
+maintainer:          rob@zinkov.com
+-- copyright:           
+-- category:            
+build-type:          Simple
+extra-source-files:  ChangeLog.md
+cabal-version:       >=1.10
+
+executable naive-bayes
+  main-is:             Main.hs
+  -- other-modules:       
+  other-extensions:    OverloadedLists
+  build-depends:       base       >=4.7  && < 5.0,
+                       containers >=0.5
+                       text       >=0.11 && < 1.3,
+                       vector     >=0.10
+                       directory  >=1.2  && < 1.3,
+                       filepath   >=1.1,
+                       text-icu   >=0.7
+  -- hs-source-dirs:      
+  default-language:    Haskell2010
