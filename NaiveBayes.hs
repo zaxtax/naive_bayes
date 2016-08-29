@@ -25,9 +25,13 @@ bagOfWords d = foldr (\x m -> M.insertWith (\_ old -> old + 1) x 1 m)
 
 dropRareWords :: Features -> Features
 dropRareWords = M.filter (> 10)
-                
-oneHotEncoder :: S.Set a -> M.Map a Int
-oneHotEncoder = undefined
+
+trainTestSplit
+    :: Double
+    -> Dataset
+    -> (Dataset, Dataset)
+trainTestSplit r d = V.splitAt (trainSize $ V.length d) d
+  where trainSize s = floor (r * fromIntegral s)
 
 convReadFile :: ICU.Converter -> FilePath -> IO T.Text
 convReadFile conv file = do
