@@ -63,4 +63,5 @@ loadDataset labels s = do
                   forM (V.fromList files) $ \f -> do
                     contents <- convReadFile conv (s </> l </> f)
                     return (bagOfWords contents, l)
-  return (mconcat rows)
+  let (train, test) = trainTestSplit 0.8 (mconcat rows)
+  return train
