@@ -33,11 +33,6 @@ trainTestSplit
 trainTestSplit r d = V.splitAt (trainSize $ V.length d) d
   where trainSize s = floor (r * fromIntegral s)
 
-convReadFile :: ICU.Converter -> FilePath -> IO T.Text
-convReadFile conv file = do
-  bs   <- BS.readFile file
-  return (ICU.toUnicode conv bs)
-
 labels :: S.Set String
 labels = [ "alt.atheism"
          , "comp.graphics"
@@ -52,6 +47,11 @@ when' :: Applicative f
       -> f a
 when' _ True  m = m
 when' d False _ = pure d
+
+convReadFile :: ICU.Converter -> FilePath -> IO T.Text
+convReadFile conv file = do
+  bs   <- BS.readFile file
+  return (ICU.toUnicode conv bs)
 
 loadDataset :: S.Set String -> String -> IO Dataset
 loadDataset labels s = do
