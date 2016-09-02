@@ -2,6 +2,9 @@
 
 module NaiveBayes where
 
+-- Implements Gibbs sampling for a semi-supervised naive bayes
+-- model. Includes functions to load text and classify.
+
 import qualified Data.Map.Strict       as M
 import qualified Data.ByteString       as BS
 import qualified Data.Text.ICU.Convert as ICU
