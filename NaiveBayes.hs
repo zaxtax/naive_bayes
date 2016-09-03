@@ -1,19 +1,19 @@
-{-# LANGUAGE OverloadedLists  #-}
-
 module NaiveBayes where
 
 -- Implements Gibbs sampling for a semi-supervised naive bayes
 -- model. Includes functions to load text and classify.
 
-import qualified Data.Map.Strict       as M
-import qualified Data.ByteString       as BS
-import qualified Data.Text.ICU.Convert as ICU
-import qualified Data.Text.IO          as IO
-import qualified Data.Text             as T
-import qualified Data.Vector           as V
-import qualified Data.Set              as S
+import qualified Data.Map.Strict                 as M
+import qualified Data.ByteString                 as BS
+import qualified Data.Text.ICU.Convert           as ICU
+import qualified Data.Text.IO                    as IO
+import qualified Data.Text                       as T
+import qualified Data.Vector                     as V
+import qualified Data.Set                        as S
 import           Data.Char
 import           Control.Monad
+import qualified System.Random.MWC               as MWC
+import qualified System.Random.MWC.Distributions as MWCD
 import           System.Directory   (listDirectory)
 import           System.FilePath
 
@@ -36,12 +36,11 @@ trainTestSplit
 trainTestSplit r d = V.splitAt (trainSize $ V.length d) d
   where trainSize s = floor (r * fromIntegral s)
 
-labels :: S.Set String
-labels = [ "alt.atheism"
-         , "comp.graphics"
-         , "sci.med"
-         , "soc.religion.christian"
-         ]
+labelPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
+labelPrior n g = MWCD.dirichlet (V.generate n (const 1)) g
+
+vocabPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
+vocabPrior n g = MWCD.dirichlet (V.generate n (const 1)) g
 
 when' :: Applicative f
       => a
