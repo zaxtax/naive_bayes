@@ -26,6 +26,15 @@ bagOfWords d = foldr (\x m -> M.insertWith (\_ old -> old + 1) x 1 m)
                 M.empty
                 (map (T.filter isAlphaNum) (T.words d))
 
+sumWordCounts :: [Features] -> Features
+sumWordCounts = M.unionsWith (+)
+
+addWordCount :: Features -> Features -> Features
+addWordCount = M.unionWith (+)
+
+subWordCount :: Features -> Features -> Features
+subWordCount = M.unionWith (-)
+
 dropRareWords :: Features -> Features
 dropRareWords = M.filter (> 10)
 
