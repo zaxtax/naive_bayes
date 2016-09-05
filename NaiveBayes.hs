@@ -37,10 +37,19 @@ trainTestSplit r d = V.splitAt (trainSize $ V.length d) d
   where trainSize s = floor (r * fromIntegral s)
 
 labelPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
-labelPrior n g = MWCD.dirichlet (V.generate n (const 1)) g
+labelPrior k g = MWCD.dirichlet (V.generate k (const 1)) g
 
 vocabPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
-vocabPrior n g = MWCD.dirichlet (V.generate n (const 1)) g
+vocabPrior k g = MWCD.dirichlet (V.generate k (const 1)) g
+
+initLabels
+    :: Int
+    -> Int
+    -> MWC.GenIO
+    -> IO (V.Vector Int)
+initLabels k n g = do
+  m <- labelPrior k g
+  V.replicateM n (MWCD.categorical m g)
 
 when' :: Applicative f
       => a
