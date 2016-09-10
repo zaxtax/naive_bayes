@@ -57,7 +57,7 @@ vocabHP :: Double
 vocabHP = 1.0
 
 vocabPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
-vocabPrior k g = MWCD.dirichlet (V.generate k (const vocabHP)) g
+vocabPrior v g = MWCD.dirichlet (V.generate v (const vocabHP)) g
 
 initLabels
     :: Int
@@ -68,13 +68,36 @@ initLabels k n g = do
   m <- labelPrior k g
   V.replicateM n (MWCD.categorical m g)
 
--- this calculates C_x from list of current labels
-documentCategoryCounts
+-- Calculates number of documents with a given category (C_x)
+-- from list of current category labels
+countDocumentCategories
     :: V.Vector Label
     -> V.Vector Int
-documentCategoryCounts =
+countDocumentCategories =
     V.fromList . M.elems . M.fromListWith (+) . map (\x -> (x,1))  . V.toList
-       
+
+-- Calculates frequency of a word in a given category (N_c)
+countWordFreqCategories = undefined
+
+sampleLabel
+    :: Int                        -- ^ Total number of documents (train+test)
+    -> Int                        -- ^ Total number of categories
+    -> V.Vector (V.Vector Double) -- ^ probability of category c for word i
+    -> V.Vector Label             -- ^ current labels for documents
+    -> V.Vector Int               -- ^ word counts for document j
+    -> MWC.GenIO                  -- ^ random seed
+    -> IO Label                   -- ^ new label to assign to document
+sampleLabel n k theta l wc g = MWCD.categorical labelPosterior g
+    where
+      categoryCounts = countDocumentCategories l
+      pow a b        = log a * fromIntegral b
+      labelPosterior = V.generate k $ \x ->
+        let theta_x  = theta V.! x
+            c_x      = categoryCounts V.! x
+        in  exp $ log (fromIntegral c_x + labelHP - 1)   -
+                  log (fromIntegral n + 2 * labelHP - 1) +
+                  sum (V.zipWith pow theta_x wc)
+
 when' :: Applicative f
       => a
       -> Bool
