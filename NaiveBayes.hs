@@ -68,6 +68,13 @@ initLabels k n g = do
   m <- labelPrior k g
   V.replicateM n (MWCD.categorical m g)
 
+-- this calculates C_x from list of current labels
+documentCategoryCounts
+    :: V.Vector Label
+    -> V.Vector Int
+documentCategoryCounts =
+    V.fromList . M.elems . M.fromListWith (+) . map (\x -> (x,1))  . V.toList
+       
 when' :: Applicative f
       => a
       -> Bool
