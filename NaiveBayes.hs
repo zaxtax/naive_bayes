@@ -17,7 +17,7 @@ import qualified System.Random.MWC.Distributions as MWCD
 import           System.Directory   (listDirectory)
 import           System.FilePath
 
-type Label    = String
+type Label    = Int
 type Features = M.Map T.Text Int
 type Dataset  = V.Vector (Features, Label)
     
@@ -90,6 +90,6 @@ loadDataset labels s = do
                   files <- listDirectory (s </> l)
                   forM (V.fromList files) $ \f -> do
                     contents <- convReadFile conv (s </> l </> f)
-                    return (bagOfWords contents, l)
+                    return (bagOfWords contents, S.findIndex l labels)
   let (train, test) = trainTestSplit 0.8 (mconcat rows)
   return train
