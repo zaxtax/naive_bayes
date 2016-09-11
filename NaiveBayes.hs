@@ -8,6 +8,7 @@ import qualified Data.ByteString                 as BS
 import qualified Data.Text.ICU.Convert           as ICU
 import qualified Data.Text.IO                    as IO
 import qualified Data.Text                       as T
+import           Data.Tuple
 import qualified Data.Vector                     as V
 import qualified Data.Set                        as S
 import           Data.Char
@@ -86,15 +87,23 @@ buildVocab = M.fromAscList
 countDocumentCategories
     :: V.Vector Label
     -> V.Vector Int
-countDocumentCategories =
-    V.fromList . M.elems . M.fromListWith (+) . map (\x -> (x,1))  . V.toList
+countDocumentCategories
+    = V.fromList
+    . M.elems
+    . M.fromListWith (+)
+    . map (\x -> (x,1))
+    . V.toList
 
 -- Calculates frequency of a word in a given category (N_c)
 countWordFreqCategories
     :: Dataset
     -> V.Vector Features
-countWordFreqCategories d =
-    undefined
+countWordFreqCategories
+    = V.fromList
+    . M.elems
+    . M.fromListWith addWordCount
+    . V.toList
+    . V.map swap
 
 sampleLabel
     :: Int                        -- ^ Total number of documents (train+test)
@@ -108,23 +117,29 @@ sampleLabel
 sampleLabel n k vocab theta l wc g =
     MWCD.categorical labelPosterior g
     where
-      categoryCounts  = countDocumentCategories l
-      docLikelihood t = M.foldrWithKey' (\word freq acc ->
-                          (t V.! (vocab M.! word)) * fromIntegral freq)
-                          0
-                          wc
-      pow a b         = log a * fromIntegral b
-      labelPosterior  = V.generate k $ \x ->
-        let c_x       = categoryCounts V.! x
-        in  exp $ log (fromIntegral c_x + labelHP - 1)   -
-                  log (fromIntegral n + 2 * labelHP - 1) +
-                  docLikelihood (theta V.! x)
+      categoryCounts x = fromIntegral (countDocumentCategories l V.! x)
+      docLikelihood t  = M.foldrWithKey' (\word freq acc ->
+                           (t V.! (vocab M.! word)) * fromIntegral freq)
+                           0
+                           wc
+      labelPosterior   = V.generate k $ \x ->
+        exp $ log (categoryCounts x + labelHP - 1)   -
+              log (fromIntegral n + 2 * labelHP - 1) +
+              docLikelihood (theta V.! x)
 
-sampleVocab
-    :: Int
+sampleTheta
+    :: Vocab
     -> Dataset
+    -> MWC.GenIO
     -> IO (V.Vector (V.Vector Double))
-sampleVocab = undefined
+sampleTheta vocab d g =
+    V.generateM k (flip MWCD.dirichlet g . t)
+    where n             = countWordFreqCategories d
+          k             = V.length n
+          vocab'        = V.fromList (M.keys vocab)
+          findCount v c = M.findWithDefault 0 v (n V.! c)
+          t c           = flip V.map vocab' $ \v ->
+                              fromIntegral (findCount v c) + vocabHP
 
 when' :: Applicative f
       => a
