@@ -18,16 +18,20 @@ import           System.Directory   (listDirectory)
 import           System.FilePath
 
 type Label    = Int
+type Vocab    = M.Map T.Text Int
 type Features = M.Map T.Text Int
 type Dataset  = V.Vector (Features, Label)
-    
+
+getFeatures :: Dataset -> V.Vector Features
+getFeatures = fst . V.unzip
+
 bagOfWords :: T.Text -> Features
 bagOfWords d = foldr (\x m -> M.insertWith (\_ old -> old + 1) x 1 m)
                 M.empty
                 (map (T.filter isAlphaNum) (T.words d))
 
-sumWordCounts :: [Features] -> Features
-sumWordCounts = M.unionsWith (+)
+sumWordCounts :: V.Vector Features -> Features
+sumWordCounts = M.unionsWith (+) . V.toList
 
 addWordCount :: Features -> Features -> Features
 addWordCount = M.unionWith (+)
@@ -68,6 +72,15 @@ initLabels k n g = do
   m <- labelPrior k g
   V.replicateM n (MWCD.categorical m g)
 
+buildVocab
+    :: Dataset
+    -> Vocab
+buildVocab = M.fromAscList
+           . flip zip [0..]
+           . M.keys
+           . sumWordCounts
+           . getFeatures
+
 -- Calculates number of documents with a given category (C_x)
 -- from list of current category labels
 countDocumentCategories
@@ -77,26 +90,41 @@ countDocumentCategories =
     V.fromList . M.elems . M.fromListWith (+) . map (\x -> (x,1))  . V.toList
 
 -- Calculates frequency of a word in a given category (N_c)
-countWordFreqCategories = undefined
+countWordFreqCategories
+    :: Dataset
+    -> V.Vector Features
+countWordFreqCategories d =
+    undefined
 
 sampleLabel
     :: Int                        -- ^ Total number of documents (train+test)
     -> Int                        -- ^ Total number of categories
+    -> Vocab                      -- ^ vocab list
     -> V.Vector (V.Vector Double) -- ^ probability of category c for word i
     -> V.Vector Label             -- ^ current labels for documents
-    -> V.Vector Int               -- ^ word counts for document j
+    -> Features                   -- ^ word counts for document j
     -> MWC.GenIO                  -- ^ random seed
     -> IO Label                   -- ^ new label to assign to document
-sampleLabel n k theta l wc g = MWCD.categorical labelPosterior g
+sampleLabel n k vocab theta l wc g =
+    MWCD.categorical labelPosterior g
     where
-      categoryCounts = countDocumentCategories l
-      pow a b        = log a * fromIntegral b
-      labelPosterior = V.generate k $ \x ->
-        let theta_x  = theta V.! x
-            c_x      = categoryCounts V.! x
+      categoryCounts  = countDocumentCategories l
+      docLikelihood t = M.foldrWithKey' (\word freq acc ->
+                          (t V.! (vocab M.! word)) * fromIntegral freq)
+                          0
+                          wc
+      pow a b         = log a * fromIntegral b
+      labelPosterior  = V.generate k $ \x ->
+        let c_x       = categoryCounts V.! x
         in  exp $ log (fromIntegral c_x + labelHP - 1)   -
                   log (fromIntegral n + 2 * labelHP - 1) +
-                  sum (V.zipWith pow theta_x wc)
+                  docLikelihood (theta V.! x)
+
+sampleVocab
+    :: Int
+    -> Dataset
+    -> IO (V.Vector (V.Vector Double))
+sampleVocab = undefined
 
 when' :: Applicative f
       => a
