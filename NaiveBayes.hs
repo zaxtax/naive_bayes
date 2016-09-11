@@ -20,7 +20,7 @@ import           System.FilePath
 
 type Label    = Int
 type Vocab    = M.Map T.Text Int
-type Features = M.Map T.Text Int
+type Features = M.Map T.Text Int -- TODO: replace with IntMap Int?
 type Dataset  = V.Vector (Features, Label)
 
 getFeatures :: Dataset -> V.Vector Features
@@ -140,6 +140,11 @@ sampleTheta vocab d g =
           findCount v c = M.findWithDefault 0 v (n V.! c)
           t c           = flip V.map vocab' $ \v ->
                               fromIntegral (findCount v c) + vocabHP
+
+sample
+    :: Dataset
+    -> IO Dataset
+sample = undefined
 
 when' :: Applicative f
       => a
