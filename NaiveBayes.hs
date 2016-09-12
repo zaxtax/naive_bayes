@@ -10,6 +10,7 @@ import qualified Data.Text.IO                    as IO
 import qualified Data.Text                       as T
 import           Data.Tuple
 import qualified Data.Vector                     as V
+import qualified Data.Vector.Mutable             as MV
 import qualified Data.Set                        as S
 import           Data.Char
 import           Control.Monad
@@ -25,6 +26,9 @@ type Dataset  = V.Vector (Features, Label)
 
 getFeatures :: Dataset -> V.Vector Features
 getFeatures = fst . V.unzip
+
+getLabels :: Dataset -> V.Vector Label
+getLabels = snd . V.unzip
 
 bagOfWords :: T.Text -> Features
 bagOfWords d = foldr (\x m -> M.insertWith (\_ old -> old + 1) x 1 m)
@@ -142,9 +146,24 @@ sampleTheta vocab d g =
                               fromIntegral (findCount v c) + vocabHP
 
 sample
-    :: Dataset
+    :: Int
+    -> V.Vector (V.Vector Double)
+    -> Vocab
+    -> Dataset
+    -> Dataset
+    -> MWC.GenIO
     -> IO Dataset
-sample = undefined
+sample k theta vocab train test g =
+    undefined
+    where
+      n    = V.length train + V.length test
+      go j =
+          let (testPre, wcAndtestPost) = V.splitAt j test
+              (wc, _)  = V.head wcAndtestPost
+              testPost = V.tail wcAndtestPost
+              labels   = getLabels testPre V.++ getLabels testPost
+          in do l <- sampleLabel n k vocab theta labels wc g
+             return (wc, l)
 
 when' :: Applicative f
       => a
