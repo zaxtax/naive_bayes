@@ -19,6 +19,8 @@ import qualified System.Random.MWC.Distributions as MWCD
 import           System.Directory   (listDirectory)
 import           System.FilePath
 
+import           Debug.Trace
+
 iterateM
     :: Monad m
     => Int
@@ -26,7 +28,7 @@ iterateM
     -> a
     -> m a
 iterateM 0 _ a = return a
-iterateM n f a = f n a >>= iterateM (n-1) f
+iterateM n f a = f (n-1) a >>= iterateM (n-1) f
 
 type Label    = Int
 type Vocab    = M.Map T.Text Int
@@ -72,14 +74,14 @@ trainTestSplit r d = V.splitAt (trainSize $ V.length d) d
 
 -- this is \gamma_{\pi} in the Resnick & Hardisty paper
 labelHP :: Double
-labelHP = 1.0
+labelHP = 0.01
 
 labelPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
 labelPrior k g = MWCD.dirichlet (V.generate k (const labelHP)) g
 
 -- this is \gamma_{\theta} in the Resnick & Hardisty paper
 vocabHP :: Double
-vocabHP = 1.0
+vocabHP = 0.01
 
 vocabPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
 vocabPrior v g = MWCD.dirichlet (V.generate v (const vocabHP)) g
@@ -115,25 +117,29 @@ buildVocab = M.fromAscList
 -- Calculates number of documents with a given category (C_x)
 -- from list of current category labels
 countDocumentCategories
-    :: V.Vector Label
+    :: Int
+    -> V.Vector Label
     -> V.Vector Int
-countDocumentCategories
-    = V.fromList
-    . M.elems
+countDocumentCategories k
+    = mkLabelVec k
     . M.fromListWith (+)
     . map (\x -> (x,1))
     . V.toList
 
+mkLabelVec k m = V.generate k $ \x -> M.findWithDefault 0 x m
+
 -- Calculates frequency of a word in a given category (N_c)
 countWordFreqCategories
-    :: Dataset
+    :: Int
+    -> Dataset
     -> V.Vector Features
-countWordFreqCategories
-    = V.fromList
-    . M.elems
+countWordFreqCategories k
+    = mkWordFreq k
     . M.fromListWith addWordCount
     . V.toList
     . V.map swap
+
+mkWordFreq k m = V.generate k $ \x -> M.findWithDefault M.empty x m
 
 sampleLabel
     :: Int                        -- ^ Total number of documents (train+test)
@@ -144,28 +150,29 @@ sampleLabel
     -> Features                   -- ^ word counts for document j
     -> MWC.GenIO                  -- ^ random seed
     -> IO Label                   -- ^ new label to assign to document
-sampleLabel n k vocab theta l wc g =
+sampleLabel n k vocab theta l wc g = do
+    when (V.any isNaN labelPosterior) (putStrLn "BOOM")
     MWCD.categorical labelPosterior g
     where
-      categoryCounts x = fromIntegral (countDocumentCategories l V.! x)
+      categoryCounts x = fromIntegral (countDocumentCategories k l V.! x)
       docLikelihood t  = M.foldrWithKey' (\word freq acc ->
-                           (t V.! (vocab M.! word)) * fromIntegral freq)
+                           acc + (t V.! (vocab M.! word)) * fromIntegral freq)
                            0
                            wc
       labelPosterior   = V.generate k $ \x ->
-        exp $ log (categoryCounts x + labelHP - 1)   -
-              log (fromIntegral n + 2 * labelHP - 1) +
-              docLikelihood (theta V.! x)
+        (categoryCounts x + labelHP - 1)    /
+        (fromIntegral n + 2 * labelHP - 1)  *
+        (exp $ docLikelihood (theta V.! x))
 
 sampleTheta
-    :: Vocab
+    :: Int
+    -> Vocab
     -> Dataset
     -> MWC.GenIO
     -> IO (V.Vector (V.Vector Double))
-sampleTheta vocab d g =
+sampleTheta k vocab d g = do
     V.generateM k (flip MWCD.dirichlet g . t)
-    where n             = countWordFreqCategories d
-          k             = V.length n
+    where n             = countWordFreqCategories k d
           vocab'        = V.fromList (M.keys vocab)
           findCount v c = M.findWithDefault 0 v (n V.! c)
           t c           = flip V.map vocab' $ \v ->
@@ -181,7 +188,7 @@ sampleIter
     -> IO (Dataset, V.Vector (V.Vector Double))
 sampleIter k theta vocab train test g = do
     test'  <- iterateM (V.length test) go test
-    theta' <- sampleTheta vocab (train V.++ test) g
+    theta' <- sampleTheta k vocab (train V.++ test) g
     return (test', theta')
     where
       n    = V.length train + V.length test
@@ -211,6 +218,7 @@ sample iter k d g = do
 
   go 0 theta' test' = return test'
   go i theta' test' = do
+      putStrLn ("Iteration: " ++ show (iter - i))
       (test'', theta'') <- sampleIter k theta' vocab train test' g
       go (i-1) theta'' test''
 
