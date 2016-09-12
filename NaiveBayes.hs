@@ -152,9 +152,9 @@ sample
     -> Dataset
     -> Dataset
     -> MWC.GenIO
-    -> IO Dataset
+    -> IO (Dataset, V.Vector (V.Vector Double))
 sample k theta vocab train test g =
-    undefined
+    return (test, theta)
     where
       n    = V.length train + V.length test
       go j =
@@ -163,7 +163,16 @@ sample k theta vocab train test g =
               testPost = V.tail wcAndtestPost
               labels   = getLabels testPre V.++ getLabels testPost
           in do l <- sampleLabel n k vocab theta labels wc g
-             return (wc, l)
+                return $ V.modify (\mv ->  MV.write mv j (wc, l)) test
+
+iterateM
+    :: Monad m
+    => Int
+    -> (Int -> a -> m a)
+    -> a
+    -> m a
+iterateM 0 _ a = return a
+iterateM n f a = f n a >>= iterateM (n-1) f
 
 when' :: Applicative f
       => a
