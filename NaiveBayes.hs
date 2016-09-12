@@ -19,6 +19,15 @@ import qualified System.Random.MWC.Distributions as MWCD
 import           System.Directory   (listDirectory)
 import           System.FilePath
 
+iterateM
+    :: Monad m
+    => Int
+    -> (Int -> a -> m a)
+    -> a
+    -> m a
+iterateM 0 _ a = return a
+iterateM n f a = f n a >>= iterateM (n-1) f
+
 type Label    = Int
 type Vocab    = M.Map T.Text Int
 type Features = M.Map T.Text Int -- TODO: replace with IntMap Int?
@@ -166,15 +175,6 @@ sampleIter k theta vocab train test g = do
               labels   = getLabels testPre V.++ getLabels testPost
           in do l <- sampleLabel n k vocab theta labels wc g
                 return $ V.modify (\mv ->  MV.write mv j (wc, l)) test'
-
-iterateM
-    :: Monad m
-    => Int
-    -> (Int -> a -> m a)
-    -> a
-    -> m a
-iterateM 0 _ a = return a
-iterateM n f a = f n a >>= iterateM (n-1) f
 
 when' :: Applicative f
       => a
