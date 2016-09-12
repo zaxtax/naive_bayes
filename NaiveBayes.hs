@@ -145,7 +145,7 @@ sampleTheta vocab d g =
           t c           = flip V.map vocab' $ \v ->
                               fromIntegral (findCount v c) + vocabHP
 
-sample
+sampleIter
     :: Int
     -> V.Vector (V.Vector Double)
     -> Vocab
@@ -153,17 +153,19 @@ sample
     -> Dataset
     -> MWC.GenIO
     -> IO (Dataset, V.Vector (V.Vector Double))
-sample k theta vocab train test g =
-    return (test, theta)
+sampleIter k theta vocab train test g = do
+    test'  <- iterateM (V.length test) go test
+    theta' <- sampleTheta vocab (train V.++ test) g
+    return (test', theta')
     where
       n    = V.length train + V.length test
-      go j =
-          let (testPre, wcAndtestPost) = V.splitAt j test
+      go j test' =
+          let (testPre, wcAndtestPost) = V.splitAt j test'
               (wc, _)  = V.head wcAndtestPost
               testPost = V.tail wcAndtestPost
               labels   = getLabels testPre V.++ getLabels testPost
           in do l <- sampleLabel n k vocab theta labels wc g
-                return $ V.modify (\mv ->  MV.write mv j (wc, l)) test
+                return $ V.modify (\mv ->  MV.write mv j (wc, l)) test'
 
 iterateM
     :: Monad m
