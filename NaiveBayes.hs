@@ -56,6 +56,13 @@ subWordCount = M.unionWith (-)
 dropRareWords :: Features -> Features
 dropRareWords = M.filter (> 10)
 
+dropUnknownWords
+    :: Vocab
+    -> Features
+    -> Features
+dropUnknownWords vocab wc =
+    M.restrictKeys wc (M.keysSet vocab)
+
 trainTestSplit
     :: Double
     -> Dataset
@@ -77,14 +84,24 @@ vocabHP = 1.0
 vocabPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
 vocabPrior v g = MWCD.dirichlet (V.generate v (const vocabHP)) g
 
-initLabels
+initLabel
     :: Int
-    -> Int
     -> MWC.GenIO
-    -> IO (V.Vector Int)
-initLabels k n g = do
+    -> IO Int
+initLabel k g = do
   m <- labelPrior k g
-  V.replicateM n (MWCD.categorical m g)
+  MWCD.categorical m g
+
+initTest
+    :: Int
+    -> Vocab
+    -> Dataset
+    -> MWC.GenIO
+    -> IO Dataset
+initTest k vocab test g =
+  V.forM test $ \(wc, _) -> do
+       l <- initLabel k g
+       return (dropUnknownWords vocab wc, l)
 
 buildVocab
     :: Dataset
@@ -176,11 +193,33 @@ sampleIter k theta vocab train test g = do
           in do l <- sampleLabel n k vocab theta labels wc g
                 return $ V.modify (\mv ->  MV.write mv j (wc, l)) test'
 
-when' :: Applicative f
-      => a
-      -> Bool
-      -> f a
-      -> f a
+sample
+    :: Int
+    -> Int
+    -> Dataset
+    -> MWC.GenIO
+    -> IO Dataset
+sample iter k d g = do
+    theta <- V.replicateM k (vocabPrior (M.size vocab) g)
+    cleanedTest <- V.forM test $ \(wc, _) -> do
+        l <- initLabel k g
+        return (dropUnknownWords vocab wc, l)
+    go iter theta cleanedTest
+  where
+  (train, test) = trainTestSplit 0.85 d
+  vocab         = buildVocab train
+
+  go 0 theta' test' = return test'
+  go i theta' test' = do
+      (test'', theta'') <- sampleIter k theta' vocab train test' g
+      go (i-1) theta'' test''
+
+when'
+    :: Applicative f
+    => a
+    -> Bool
+    -> f a
+    -> f a
 when' _ True  m = m
 when' d False _ = pure d
 
@@ -201,3 +240,10 @@ loadDataset labels s = do
                     return (bagOfWords contents, S.findIndex l labels)
   let (train, test) = trainTestSplit 0.8 (mconcat rows)
   return train
+
+confusionMatrix
+    :: V.Vector Label
+    -> V.Vector Label
+    -> S.Set String
+    -> IO ()
+confusionMatrix = undefined
