@@ -151,7 +151,6 @@ sampleLabel
     -> MWC.GenIO                  -- ^ random seed
     -> IO Label                   -- ^ new label to assign to document
 sampleLabel n k vocab theta l wc g = do
-    when (V.any isNaN labelPosterior) (putStrLn "BOOM")
     MWCD.categorical labelPosterior g
     where
       categoryCounts x = fromIntegral (countDocumentCategories k l V.! x)
