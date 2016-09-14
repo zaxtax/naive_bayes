@@ -254,7 +254,8 @@ accuracy
     :: V.Vector Label
     -> V.Vector Label
     -> Double
-accuracy = undefined
+accuracy ytrue ypred = fromIntegral trues / (fromIntegral $ V.length ytrue)
+    where trues = V.length . V.filter id $ V.zipWith (==) ytrue ypred
 
 confusionMatrix
     :: V.Vector Label
