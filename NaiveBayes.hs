@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings  #-}
+
 module NaiveBayes where
 
 -- Implements Gibbs sampling for a semi-supervised naive bayes
@@ -248,6 +250,12 @@ loadDataset labels s = do
   let (train, test) = trainTestSplit 0.8 (mconcat rows)
   return train
 
+accuracy
+    :: V.Vector Label
+    -> V.Vector Label
+    -> Double
+accuracy = undefined
+
 confusionMatrix
     :: V.Vector Label
     -> V.Vector Label
@@ -255,7 +263,7 @@ confusionMatrix
     -> IO ()
 confusionMatrix = undefined
 
-stopWords :: S.Set Text
+stopWords :: S.Set T.Text
 stopWords = S.fromList
      [ "i"
      , "me"
