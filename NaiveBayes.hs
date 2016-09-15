@@ -155,13 +155,13 @@ sampleLabel
 sampleLabel n k vocab theta l wc g = do
     MWCD.categorical labelPosterior g
     where
-      categoryCounts x = fromIntegral (countDocumentCategories k l V.! x)
+      categoryCounts   = countDocumentCategories k l
       docLikelihood t  = M.foldrWithKey' (\word freq acc ->
                            acc + log (t V.! (vocab M.! word)) * fromIntegral freq)
                            0
                            wc
       labelPosterior   = V.generate k $ \x ->
-        (categoryCounts x + labelHP - 1)    /
+        (fromIntegral (categoryCounts V.! x) + labelHP - 1)    /
         (fromIntegral n + 2 * labelHP - 1)  *
         (exp $ docLikelihood (theta V.! x))
 
