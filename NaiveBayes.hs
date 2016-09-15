@@ -74,14 +74,14 @@ trainTestSplit
 trainTestSplit r d = V.splitAt (trainSize $ V.length d) d
   where trainSize s = floor (r * fromIntegral s)
 
--- this is \gamma_{\pi} in the Resnick & Hardisty paper
+-- this is \gamma_{\pi} in the Resnik & Hardisty paper
 labelHP :: Double
 labelHP = 1.0
 
 labelPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
 labelPrior k g = MWCD.dirichlet (V.generate k (const labelHP)) g
 
--- this is \gamma_{\theta} in the Resnick & Hardisty paper
+-- this is \gamma_{\theta} in the Resnik & Hardisty paper
 vocabHP :: Double
 vocabHP = 1.0
 
