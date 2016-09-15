@@ -74,14 +74,14 @@ trainTestSplit
 trainTestSplit r d = V.splitAt (trainSize $ V.length d) d
   where trainSize s = floor (r * fromIntegral s)
 
--- this is \gamma_{\pi} in the Resnick & Hardisty paper
+-- this is \gamma_{\pi} in the Resnik & Hardisty paper
 labelHP :: Double
 labelHP = 1.0
 
 labelPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
 labelPrior k g = MWCD.dirichlet (V.generate k (const labelHP)) g
 
--- this is \gamma_{\theta} in the Resnick & Hardisty paper
+-- this is \gamma_{\theta} in the Resnik & Hardisty paper
 vocabHP :: Double
 vocabHP = 1.0
 
@@ -155,13 +155,13 @@ sampleLabel
 sampleLabel n k vocab theta l wc g = do
     MWCD.categorical labelPosterior g
     where
-      categoryCounts x = fromIntegral (countDocumentCategories k l V.! x)
+      categoryCounts   = countDocumentCategories k l
       docLikelihood t  = M.foldrWithKey' (\word freq acc ->
-                           acc + (t V.! (vocab M.! word)) * fromIntegral freq)
+                           acc + log (t V.! (vocab M.! word)) * fromIntegral freq)
                            0
                            wc
       labelPosterior   = V.generate k $ \x ->
-        (categoryCounts x + labelHP - 1)    /
+        (fromIntegral (categoryCounts V.! x) + labelHP - 1)    /
         (fromIntegral n + 2 * labelHP - 1)  *
         (exp $ docLikelihood (theta V.! x))
 
@@ -189,7 +189,7 @@ sampleIter
     -> IO (Dataset, V.Vector (V.Vector Double))
 sampleIter k theta vocab train test g = do
     test'  <- iterateM (V.length test) go test
-    theta' <- sampleTheta k vocab (train V.++ test) g
+    theta' <- sampleTheta k vocab (train V.++ test') g
     return (test', theta')
     where
       n    = V.length train + V.length test
@@ -248,6 +248,8 @@ loadDataset labels s = do
                     contents <- convReadFile conv (s </> l </> f)
                     return (bagOfWords contents, S.findIndex l labels)
   let (train, test) = trainTestSplit 0.8 (mconcat rows)
+      -- TODO: use "test" from split
+      -- (and does rows need to be shuffled before splitting?)
   return train
 
 accuracy
