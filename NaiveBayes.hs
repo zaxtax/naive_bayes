@@ -248,6 +248,8 @@ loadDataset labels s = do
                     contents <- convReadFile conv (s </> l </> f)
                     return (bagOfWords contents, S.findIndex l labels)
   let (train, test) = trainTestSplit 0.8 (mconcat rows)
+      -- TODO: use "test" from split
+      -- (and does rows need to be shuffled before splitting?)
   return train
 
 accuracy
