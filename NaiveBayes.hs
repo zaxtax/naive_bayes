@@ -157,7 +157,7 @@ sampleLabel n k vocab theta l wc g = do
     where
       categoryCounts x = fromIntegral (countDocumentCategories k l V.! x)
       docLikelihood t  = M.foldrWithKey' (\word freq acc ->
-                           acc + (t V.! (vocab M.! word)) * fromIntegral freq)
+                           acc + log (t V.! (vocab M.! word)) * fromIntegral freq)
                            0
                            wc
       labelPosterior   = V.generate k $ \x ->
