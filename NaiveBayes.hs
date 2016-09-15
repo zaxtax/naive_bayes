@@ -189,7 +189,7 @@ sampleIter
     -> IO (Dataset, V.Vector (V.Vector Double))
 sampleIter k theta vocab train test g = do
     test'  <- iterateM (V.length test) go test
-    theta' <- sampleTheta k vocab (train V.++ test) g
+    theta' <- sampleTheta k vocab (train V.++ test') g
     return (test', theta')
     where
       n    = V.length train + V.length test
