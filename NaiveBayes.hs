@@ -52,7 +52,7 @@ dropStopWords :: Features -> Features
 dropStopWords wc = M.withoutKeys wc stopWords
 
 toFeatures :: T.Text -> Features
-toFeatures = dropStopWords . bagOfWords
+toFeatures = dropRareWords . dropStopWords . bagOfWords
 
 sumWordCounts :: V.Vector Features -> Features
 sumWordCounts = M.unionsWith (+) . V.toList
