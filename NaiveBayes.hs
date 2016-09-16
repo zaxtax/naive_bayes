@@ -46,7 +46,13 @@ getLabels = snd . V.unzip
 bagOfWords :: T.Text -> Features
 bagOfWords d = foldr (\x m -> M.insertWith (\_ old -> old + 1) x 1 m)
                 M.empty
-                (map (T.filter isAlphaNum) (T.words d))
+                (map (T.toLower . T.filter isAlphaNum) (T.words d))
+
+dropStopWords :: Features -> Features
+dropStopWords wc = M.withoutKeys wc stopWords
+
+toFeatures :: T.Text -> Features
+toFeatures = dropStopWords . bagOfWords
 
 sumWordCounts :: V.Vector Features -> Features
 sumWordCounts = M.unionsWith (+) . V.toList
@@ -58,7 +64,7 @@ subWordCount :: Features -> Features -> Features
 subWordCount = M.unionWith (-)
 
 dropRareWords :: Features -> Features
-dropRareWords = M.filter (> 10)
+dropRareWords = M.filter (> 1)
 
 dropUnknownWords
     :: Vocab
@@ -246,7 +252,7 @@ loadDataset labels s = do
                   files <- listDirectory (s </> l)
                   forM (V.fromList files) $ \f -> do
                     contents <- convReadFile conv (s </> l </> f)
-                    return (bagOfWords contents, S.findIndex l labels)
+                    return (toFeatures contents, S.findIndex l labels)
   let (train, test) = trainTestSplit 0.8 (mconcat rows)
       -- TODO: use "test" from split
       -- (and does rows need to be shuffled before splitting?)
