@@ -32,6 +32,15 @@ iterateM
 iterateM 0 _ a = return a
 iterateM n f a = f (n-1) a >>= iterateM (n-1) f
 
+groupBy
+    :: Ord k
+    => (a -> k)
+    -> [a]
+    -> M.Map k [a]
+groupBy f xs = foldr (\x m -> M.insertWith (++) (f x) [x] m)
+                     M.empty
+                     xs
+
 type Label    = Int
 type Vocab    = M.Map T.Text Int
 type Features = M.Map T.Text Int -- TODO: replace with IntMap Int?
@@ -79,6 +88,13 @@ trainTestSplit
     -> (Dataset, Dataset)
 trainTestSplit r d = V.splitAt (trainSize $ V.length d) d
   where trainSize s = floor (r * fromIntegral s)
+
+labelAwareTrainTestSplit
+    :: Double
+    -> Dataset
+    -> (Dataset, Dataset)
+labelAwareTrainTestSplit = undefined
+
 
 -- this is \gamma_{\pi} in the Resnik & Hardisty paper
 labelHP :: Double
