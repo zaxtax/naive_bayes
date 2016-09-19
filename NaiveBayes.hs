@@ -10,6 +10,7 @@ import qualified Data.ByteString                 as BS
 import qualified Data.Text.ICU.Convert           as ICU
 import qualified Data.Text.IO                    as IO
 import qualified Data.Text                       as T
+import qualified Data.Bifunctor                  as BI
 import           Data.Tuple
 import qualified Data.Vector                     as V
 import qualified Data.Vector.Mutable             as MV
@@ -96,8 +97,10 @@ labelAwareTrainTestSplit
     :: Double
     -> Dataset
     -> (Dataset, Dataset)
-labelAwareTrainTestSplit = undefined
-
+labelAwareTrainTestSplit r d =
+    let m = groupBy snd (V.toList d) in
+    BI.bimap mconcat mconcat
+      (unzip . M.elems $ M.map (trainTestSplit r . V.fromList) m)
 
 -- this is \gamma_{\pi} in the Resnik & Hardisty paper
 labelHP :: Double
