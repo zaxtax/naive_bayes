@@ -28,7 +28,7 @@ example = do
   d'     <- MWCD.uniformShuffle d g
   let (train, test) = labelAwareTrainTestSplit 0.85 d'
   let ytrue = getLabels test
-  ypred <- getLabels <$> sample 20 (S.size labels) train test g
+  ypred <- getLabels <$> sample 30 (S.size labels) train test g
   return (accuracy ytrue ypred)
 
 main :: IO ()
