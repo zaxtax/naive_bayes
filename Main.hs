@@ -26,7 +26,7 @@ example = do
   g      <- MWC.createSystemRandom
   d      <- loadDataset labels "/home/zv/datasets/20_newsgroups"
   d'     <- MWCD.uniformShuffle d g
-  let (train, test) = labelAwareTrainTestSplit 0.85 d
+  let (train, test) = labelAwareTrainTestSplit 0.85 d'
   let ytrue = getLabels test
   ypred <- getLabels <$> sample 20 (S.size labels) train test g
   return (accuracy ytrue ypred)
@@ -36,4 +36,3 @@ main = do
   putStrLn "Running inference for 20 Newsgroups:"
   acc <- example
   putStrLn $ printf "Accuracy on 20 Newsgroups: %.2f%%" (acc * 100)
-  

@@ -275,10 +275,7 @@ loadDataset labels s = do
                   forM (V.fromList files) $ \f -> do
                     contents <- convReadFile conv (s </> l </> f)
                     return (toFeatures contents, S.findIndex l labels)
-  let (train, test) = trainTestSplit 0.8 (mconcat rows)
-      -- TODO: use "test" from split
-      -- (and does rows need to be shuffled before splitting?)
-  return train
+  return (mconcat rows)
 
 accuracy
     :: V.Vector Label
