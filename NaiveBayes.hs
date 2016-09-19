@@ -233,21 +233,21 @@ sample
     :: Int
     -> Int
     -> Dataset
+    -> Dataset
     -> MWC.GenIO
     -> IO Dataset
-sample iter k d g = do
+sample iter k train test g = do
     theta <- V.replicateM k (vocabPrior (M.size vocab) g)
     cleanedTest <- V.forM test $ \(wc, _) -> do
         l <- initLabel k g
         return (dropUnknownWords vocab wc, l)
     go iter theta cleanedTest
   where
-  (train, test) = trainTestSplit 0.85 d
-  vocab         = buildVocab train
+  vocab = buildVocab train
 
   go 0 theta' test' = return test'
   go i theta' test' = do
-      putStrLn ("Iteration: " ++ show (iter - i))
+      putStrLn ("Iteration: " ++ show (iter - i + 1))
       (test'', theta'') <- sampleIter k theta' vocab train test' g
       go (i-1) theta'' test''
 
