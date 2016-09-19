@@ -23,9 +23,9 @@ labels = [ "alt.atheism"
 
 example :: IO Double
 example = do
-  g      <- MWC.createSystemRandom
-  d      <- loadDataset labels "/home/zv/datasets/20_newsgroups"
-  d'     <- MWCD.uniformShuffle d g
+  g  <- MWC.createSystemRandom
+  d  <- loadDataset labels "/home/zv/datasets/20_newsgroups"
+  d' <- MWCD.uniformShuffle d g
   let (train, test) = labelAwareTrainTestSplit 0.85 d'
   let ytrue = getLabels test
   ypred <- getLabels <$> sample 30 (S.size labels) train test g
