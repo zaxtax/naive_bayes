@@ -284,13 +284,6 @@ accuracy
 accuracy ytrue ypred = fromIntegral trues / (fromIntegral $ V.length ytrue)
     where trues = V.length . V.filter id $ V.zipWith (==) ytrue ypred
 
-confusionMatrix
-    :: V.Vector Label
-    -> V.Vector Label
-    -> S.Set String
-    -> IO ()
-confusionMatrix = undefined
-
 stopWords :: S.Set T.Text
 stopWords = S.fromList
      [ "i"
