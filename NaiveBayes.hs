@@ -4,6 +4,8 @@ module NaiveBayes where
 
 -- Implements Gibbs sampling for a semi-supervised naive bayes
 -- model. Includes functions to load text and classify.
+--
+-- This is the Dirichlet-Multinomial model from McCallum and Nigam 1998
 
 import qualified Data.Map.Strict                 as M
 import qualified Data.ByteString                 as BS
