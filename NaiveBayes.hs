@@ -24,7 +24,7 @@ import qualified System.Random.MWC.Distributions as MWCD
 import           System.Directory   (listDirectory)
 import           System.FilePath
 
-import           Debug.Trace
+import           NBHakaru
 
 iterateM
     :: Monad m
@@ -231,6 +231,7 @@ sampleIter k theta vocab train test g = do
           in do l <- sampleLabel n k vocab theta labels wc g
                 return $ V.modify (\mv ->  MV.write mv j (wc, l)) test'
 
+-- Sample function to use with handwritten implementation
 sample
     :: Int
     -> Int
@@ -238,20 +239,42 @@ sample
     -> Dataset
     -> MWC.GenIO
     -> IO Dataset
-sample iter k train test g = do
+sample iters k train test g = do
     theta <- V.replicateM k (vocabPrior (M.size vocab) g)
     cleanedTest <- V.forM test $ \(wc, _) -> do
         l <- initLabel k g
         return (dropUnknownWords vocab wc, l)
-    go iter theta cleanedTest
+    go iters theta cleanedTest
   where
   vocab = buildVocab train
 
   go 0 theta' test' = return test'
   go i theta' test' = do
-      putStrLn ("Iteration: " ++ show (iter - i + 1))
+      putStrLn ("Iteration: " ++ show (iters - i + 1))
       (test'', theta'') <- sampleIter k theta' vocab train test' g
       go (i-1) theta'' test''
+
+-- Sample function to use with Hakaru-generated implementation
+sampleH
+    :: Int
+    -> Int
+    -> Dataset
+    -> Dataset
+    -> MWC.GenIO
+    -> IO Dataset
+sampleH iters k train test g =  do
+    theta <- V.replicateM k (vocabPrior (M.size vocab) g)
+    cleanedTest <- V.forM test $ \(wc, _) -> do
+        l <- initLabel k g
+        return (dropUnknownWords vocab wc, l)
+    go iters theta cleanedTest
+  where
+  vocab = buildVocab train
+
+  go 0 theta' test' = return test'
+  go i theta' test' = undefined
+  --prog vocabPrior labelPrior
+
 
 when'
     :: Applicative f
