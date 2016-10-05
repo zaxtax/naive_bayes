@@ -44,8 +44,8 @@ groupBy f xs = foldr (\x m -> M.insertWith (++) (f x) [x] m)
                      M.empty
                      xs
 
-normalizeWords :: T.Text -> T.Text
-normalizeWords = T.toLower . T.filter isAlphaNum
+normalizeWord :: T.Text -> T.Text
+normalizeWord = T.toLower . T.filter isAlphaNum
 
 type Label    = Int
 type Vocab    = M.Map T.Text Int
@@ -61,7 +61,7 @@ getLabels = snd . V.unzip
 bagOfWords :: T.Text -> Features
 bagOfWords d = foldr (\x m -> M.insertWith (\_ old -> old + 1) x 1 m)
                 M.empty
-                (map normalizeWords (T.words d))
+                (map normalizeWord (T.words d))
 
 dropStopWords :: Features -> Features
 dropStopWords wc = M.withoutKeys wc stopWords
