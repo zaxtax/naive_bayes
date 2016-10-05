@@ -270,8 +270,9 @@ sample
     -> Dataset
     -> Dataset
     -> MWC.GenIO
+    -> (Dataset -> IO a)
     -> IO Dataset
-sample iters k train test g = do
+sample iters k train test g post = do
     theta <- V.replicateM k (vocabPrior (M.size vocab) g)
     cleanedTest <- V.forM test $ \(wc, _) -> do
         l <- initLabel k g
@@ -282,8 +283,9 @@ sample iters k train test g = do
 
   go 0 theta' test' = return test'
   go i theta' test' = do
-      putStrLn ("Iteration: " ++ show (iters - i + 1))
+      putStr ("Iteration: " ++ show (iters - i + 1))
       (test'', theta'') <- sampleIter k theta' vocab train test' g
+      post test''
       go (i-1) theta'' test''
 
 stopWords :: S.Set T.Text

@@ -23,14 +23,21 @@ labels = [ "alt.atheism"
 
 example :: IO Double
 example = do
-  g  <- MWC.createSystemRandom
-  d  <- loadDataset labels "/home/zv/datasets/20_newsgroups"
-  d' <- MWCD.uniformShuffle d g
-  let (train, test) = labelAwareTrainTestSplit 0.85 d'
-  let ytrue = getLabels test
-  ypred <- getLabels <$> sample 30 (S.size labels) train test g
-  return (accuracy ytrue ypred)
-
+    g  <- MWC.createSystemRandom
+    d  <- loadDataset labels "/home/zv/datasets/20_newsgroups"
+    d' <- MWCD.uniformShuffle d g
+    let (train, test) = labelAwareTrainTestSplit 0.85 d'
+    let ytrue = getLabels test
+    ypred <- getLabels <$> sample 10 (S.size labels) train test g (printAccuracy ytrue)
+    return (accuracy ytrue ypred)
+  where printAccuracy
+            :: V.Vector Label
+            -> Dataset
+            -> IO ()
+        printAccuracy ytrue test = do
+            let acc = accuracy ytrue (getLabels test)
+            putStrLn $ printf ", Accuracy: %.2f%%" (acc * 100)
+        
 main :: IO ()
 main = do
   putStrLn "Running inference for 20 Newsgroups:"

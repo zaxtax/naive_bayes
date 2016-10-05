@@ -92,7 +92,7 @@ sampleH
     -> Int          -- ^ Total number of categories
     -> HDataset     -- ^ Training Set
     -> HDataset     -- ^ Testing Set
-    -> MWC.GenIO    -- ^ random seed
+    -> MWC.GenIO    -- ^ Random seed
     -> IO HDataset  -- ^ New Testing Set
 sampleH iters k train test g = undefined
   --prog vocabPrior labelPrior
