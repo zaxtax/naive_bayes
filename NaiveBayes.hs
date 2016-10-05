@@ -24,7 +24,6 @@ import qualified System.Random.MWC.Distributions as MWCD
 import           System.Directory   (listDirectory)
 import           System.FilePath
 
-import           NBHakaru
 
 iterateM
     :: Monad m
@@ -43,14 +42,47 @@ groupBy
 groupBy f xs = foldr (\x m -> M.insertWith (++) (f x) [x] m)
                      M.empty
                      xs
+                     
+when'
+    :: Applicative f
+    => a
+    -> Bool
+    -> f a
+    -> f a
+when' _ True  m = m
+when' d False _ = pure d
 
-normalizeWord :: T.Text -> T.Text
-normalizeWord = T.toLower . T.filter isAlphaNum
+convReadFile :: ICU.Converter -> FilePath -> IO T.Text
+convReadFile conv file = do
+  bs   <- BS.readFile file
+  return (ICU.toUnicode conv bs)
 
 type Label    = Int
 type Vocab    = M.Map T.Text Int
 type Features = M.Map T.Text Int -- TODO: replace with IntMap Int?
 type Dataset  = V.Vector (Features, Label)
+
+loadDataset :: S.Set String -> FilePath -> IO Dataset
+loadDataset labels s = do
+  conv <- ICU.open "utf-8" Nothing
+  dirs <- listDirectory s
+  rows <- forM dirs $ \l ->
+            when' mempty (S.member l labels) $ do
+                  files <- listDirectory (s </> l)
+                  forM (V.fromList files) $ \f -> do
+                    contents <- convReadFile conv (s </> l </> f)
+                    return (toFeatures contents, S.findIndex l labels)
+  return (mconcat rows)
+
+accuracy
+    :: V.Vector Label
+    -> V.Vector Label
+    -> Double
+accuracy ytrue ypred = fromIntegral trues / (fromIntegral $ V.length ytrue)
+    where trues = V.length . V.filter id $ V.zipWith (==) ytrue ypred
+
+normalizeWord :: T.Text -> T.Text
+normalizeWord = T.toLower . T.filter isAlphaNum
 
 getFeatures :: Dataset -> V.Vector Features
 getFeatures = fst . V.unzip
@@ -253,61 +285,6 @@ sample iters k train test g = do
       putStrLn ("Iteration: " ++ show (iters - i + 1))
       (test'', theta'') <- sampleIter k theta' vocab train test' g
       go (i-1) theta'' test''
-
--- Sample function to use with Hakaru-generated implementation
-sampleH
-    :: Int
-    -> Int
-    -> Dataset
-    -> Dataset
-    -> MWC.GenIO
-    -> IO Dataset
-sampleH iters k train test g =  do
-    theta <- V.replicateM k (vocabPrior (M.size vocab) g)
-    cleanedTest <- V.forM test $ \(wc, _) -> do
-        l <- initLabel k g
-        return (dropUnknownWords vocab wc, l)
-    go iters theta cleanedTest
-  where
-  vocab = buildVocab train
-
-  go 0 theta' test' = return test'
-  go i theta' test' = undefined
-  --prog vocabPrior labelPrior
-
-
-when'
-    :: Applicative f
-    => a
-    -> Bool
-    -> f a
-    -> f a
-when' _ True  m = m
-when' d False _ = pure d
-
-convReadFile :: ICU.Converter -> FilePath -> IO T.Text
-convReadFile conv file = do
-  bs   <- BS.readFile file
-  return (ICU.toUnicode conv bs)
-
-loadDataset :: S.Set String -> String -> IO Dataset
-loadDataset labels s = do
-  conv <- ICU.open "utf-8" Nothing
-  dirs <- listDirectory s
-  rows <- forM dirs $ \l ->
-            when' mempty (S.member l labels) $ do
-                  files <- listDirectory (s </> l)
-                  forM (V.fromList files) $ \f -> do
-                    contents <- convReadFile conv (s </> l </> f)
-                    return (toFeatures contents, S.findIndex l labels)
-  return (mconcat rows)
-
-accuracy
-    :: V.Vector Label
-    -> V.Vector Label
-    -> Double
-accuracy ytrue ypred = fromIntegral trues / (fromIntegral $ V.length ytrue)
-    where trues = V.length . V.filter id $ V.zipWith (==) ytrue ypred
 
 stopWords :: S.Set T.Text
 stopWords = S.fromList
