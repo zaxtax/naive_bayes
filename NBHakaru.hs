@@ -42,9 +42,19 @@ sampleH
     -> MWC.GenIO    -- ^ Random seed
     -> IO Dataset  -- ^ New Testing Set
 sampleH iters k train test g = undefined
-  --prog vocabPrior labelPrior
 
 featuresToHFeatures = undefined
+
+runner :: IO ()
+runner = do
+    g      <- MWC.createSystemRandom
+    vocabP <- vocabPrior 2 g
+    labelP <- labelPrior 3 g
+    sample <- unMeasure (prog vocabP labelP z w doc 1) g
+    print sample
+  where z   = V.fromList []
+        w   = V.fromList []
+        doc = V.fromList []
 
 prog = 
   lam $ \ topic_prior0 ->
