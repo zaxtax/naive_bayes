@@ -5,6 +5,7 @@ module Main where
 import           Prelude                          hiding (product)
 import           Language.Hakaru.Runtime.Prelude
 import           Language.Hakaru.Types.Sing
+import           System.CPUTime
 import qualified System.Random.MWC                as MWC
 import qualified System.Random.MWC.Distributions  as MWCD
 import           Control.Monad
@@ -13,6 +14,7 @@ import qualified Data.Vector.Mutable              as MV
 import qualified Data.Set                         as S
 import qualified Data.Map.Strict                  as M
 import qualified Data.Text                        as T
+import           Text.Printf
 
 -- this is \gamma_{\pi} in the Resnik & Hardisty paper
 labelHP :: Double
@@ -35,11 +37,11 @@ type Dataset  = (Features, Label)
 
 -- Sample function to use with Hakaru-generated implementation
 sampleH
-    :: Int          -- ^ Total number of iterations
-    -> Int          -- ^ Total number of categories
+    :: Int         -- ^ Total number of iterations
+    -> Int         -- ^ Total number of categories
     -> Dataset     -- ^ Training Set
     -> Dataset     -- ^ Testing Set
-    -> MWC.GenIO    -- ^ Random seed
+    -> MWC.GenIO   -- ^ Random seed
     -> IO Dataset  -- ^ New Testing Set
 sampleH iters k train test g = undefined
 
@@ -48,15 +50,22 @@ featuresToHFeatures = undefined
 runner :: IO ()
 runner = do
     g      <- MWC.createSystemRandom
+    -- Just (z, w) <- unMeasure (generateDataset 20 40000 20000 6000000 doc) g
     -- vocabP <- vocabPrior 40000 g
     -- labelP <- labelPrior 20 g
-    -- Just (z, w) <- unMeasure (generateDataset 20 40000 20000 6000000 doc) g
+    start  <- getCPUTime
+    Just (z, w) <- unMeasure (generateDataset 10 4000 1000 6000 doc) g
+    mid    <- getCPUTime
+    printf "Time to generate data: %0.3f sec\n" (diff start mid)
     vocabP <- vocabPrior 4000 g
     labelP <- labelPrior 10 g
-    Just (z, w) <- unMeasure (generateDataset 10 4000 1000 6000 doc) g
     sample <- unMeasure (gibbs vocabP labelP z w doc 1) g
+    stop   <- getCPUTime
+    printf "Time to gibbs update: %0.3f sec\n" (diff mid stop)
     print sample
-  where doc = V.concat $ map (V.replicate 100) [0..9]
+  where doc = V.concat $ map (V.replicate 1000) [0..5]
+        diff :: Integer -> Integer -> Double
+        diff start end = (fromIntegral (end - start)) / (10^12)
 --  where doc = V.concat $ map (\i -> V.replicate 1000 i) [0..19]
 
 main = runner
@@ -77,16 +86,16 @@ generateDataset =
                             branch pfalse
                                    (unsafeProb (nat2real (nat_ 1) +
                                                 negate (fromProb (xs2 ! i5))))])) $ \ dirichlet0 ->
-  let_ (lam $ \ k9 ->
-        lam $ \ v10 ->
-        lam $ \ z11 ->
-        lam $ \ w12 ->
-        lam $ \ doc13 ->
-        let_ (array k9 $ \ k15 -> prob_ 1) $ \ topic_prior14 ->
-        let_ (array v10 $ \ v17 -> prob_ 1) $ \ word_prior16 ->
+  let_ (lam $ \k9 ->
+        lam $ \v10 ->
+        lam $ \z11 ->
+        lam $ \w12 ->
+        lam $ \doc13 ->
+        let_ (array k9 $ \k15 -> prob_ 1) $ \ topic_prior14 ->
+        let_ (array v10 $ \v17 -> prob_ 1) $ \ word_prior16 ->
         dirichlet0 `app` topic_prior14 >>= \ theta18 ->
-        (plate k9 $ \ k20 -> dirichlet0 `app` word_prior16) >>= \ phi19 ->
-        (plate z11 $ \ i22 -> categorical theta18) >>= \ z21 ->
+        (plate k9 $ \k20 -> dirichlet0 `app` word_prior16) >>= \ phi19 ->
+        (plate z11 $ \i22 -> categorical theta18) >>= \ z21 ->
         (plate w12 $
                \ n24 -> categorical (phi19 ! (z21 ! (doc13 ! n24)))) >>= \ w23 ->
         dirac (ann_ (SData (STyApp (STyApp (STyCon (SingSymbol :: Sing "Pair")) (SArray SNat)) (SArray SNat)) (SPlus (SEt (SKonst (SArray SNat)) (SEt (SKonst (SArray SNat)) SDone)) SVoid))
