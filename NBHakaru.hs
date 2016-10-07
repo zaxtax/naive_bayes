@@ -28,62 +28,6 @@ vocabHP = 1.0
 vocabPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
 vocabPrior v g = MWCD.dirichlet (V.generate v (const vocabHP)) g
 
-prog = 
-  let_ (lam $ \ as1 ->
-        (plate (unsafeNat (nat2int (size as1) +
-                           negate (nat2int (nat_ 1)))) $
-               \ i3 ->
-               beta (summate (i3 + nat_ 1) (size as1) (\ j4 -> as1 ! j4))
-                    (as1 ! i3)) >>= \ xs2 ->
-        dirac (array (size as1) $
-                     \ i5 ->
-                     let_ (product (nat_ 0) i5 (\ j7 -> xs2 ! j7)) $ \ x6 ->
-                     x6 *
-                     case_ (i5 + nat_ 1 == size as1)
-                           [branch ptrue (nat2prob (nat_ 1)),
-                            branch pfalse
-                                   (unsafeProb (nat2real (nat_ 1) +
-                                                negate (fromProb (xs2 ! i5))))])) $ \ dirichlet0 ->
-  let_ (lam $ \ topic_prior9 ->
-        lam $ \ word_prior10 ->
-        lam $ \ z11 ->
-        lam $ \ w12 ->
-        lam $ \ doc13 ->
-        lam $ \ docUpdate14 ->
-        case_ (docUpdate14 < size z11)
-              [branch ptrue
-                      (dirichlet0 `app` topic_prior9 >>= \ theta15 ->
-                       (plate (size topic_prior9) $
-                              \ k17 -> dirichlet0 `app` word_prior10) >>= \ phi16 ->
-                       categorical (array (size topic_prior9) $
-                                          \ i19 -> nat2prob (nat_ 1)) >>= \ zNew18 ->
-                       (plate (size z11) $
-                              \ i21 ->
-                              let_ (case_ (i21 == docUpdate14)
-                                          [branch ptrue (zNew18),
-                                           branch pfalse (z11 ! i21)]) $ \ zz22 ->
-                              (pose (theta15 ! zz22 *
-                                     recip (summate (nat_ 0)
-                                                    (size theta15)
-                                                    (\ x0 -> theta15 ! x0))) $
-                                    (dirac (ann_ (SData (STyCon (SingSymbol :: Sing "Unit"))
-                                                            (SPlus SDone SVoid))
-                                                 (unit)))) >>= \ x23 ->
-                              dirac zz22) >>= \ z20 ->
-                       (plate (size w12) $
-                              \ n24 ->
-                              (pose (phi16 ! (z20 ! (doc13 ! n24)) ! (w12 ! n24) *
-                                     recip (summate (nat_ 0)
-                                                    (size (phi16 ! (z20 ! (doc13 ! n24))))
-                                                    (\ x0 -> phi16 ! (z20 ! (doc13 ! n24)) ! x0))) $
-                                    (dirac (ann_ (SData (STyCon (SingSymbol :: Sing "Unit"))
-                                                            (SPlus SDone SVoid))
-                                                 (unit)))) >>= \ x25 ->
-                              dirac (w12 ! n24)) >>= \ w23 ->
-                       dirac zNew18),
-               branch pfalse (reject)]) $ \ naive_bayes8 ->
-  naive_bayes8
-
 type Label    = Int
 type Vocab    = M.Map T.Text Int
 type Features = V.Vector Integer
@@ -99,3 +43,251 @@ sampleH
     -> IO Dataset  -- ^ New Testing Set
 sampleH iters k train test g = undefined
   --prog vocabPrior labelPrior
+
+featuresToHFeatures = undefined
+
+prog = 
+  lam $ \ topic_prior0 ->
+  lam $ \ word_prior1 ->
+  lam $ \ z2 ->
+  lam $ \ w3 ->
+  lam $ \ doc4 ->
+  lam $ \ docUpdate5 ->
+  case_ (docUpdate5 < size z2)
+        [branch ptrue
+                ((pose (product (nat_ 0)
+                                (size topic_prior0)
+                                (\ i6 ->
+                                 product (nat_ 0)
+                                         (size word_prior1)
+                                         (\ i丣7 ->
+                                          product (nat_ 0)
+                                                  (summate (nat_ 0)
+                                                           (size w3)
+                                                           (\ i丙9 ->
+                                                            case_ (docUpdate5 == doc4 ! i丙9)
+                                                                  [branch ptrue (nat_ 0),
+                                                                   branch pfalse
+                                                                          (case_ (i6
+                                                                                  == z2
+                                                                                     ! (doc4
+                                                                                        ! i丙9) &&
+                                                                                  i丣7 == w3 ! i丙9)
+                                                                                 [branch ptrue
+                                                                                         (nat_ 1),
+                                                                                  branch pfalse
+                                                                                         (nat_ 0)])]))
+                                                  (\ j8 ->
+                                                   (nat2prob j8 + word_prior1 ! i丣7) *
+                                                   product (nat_ 0)
+                                                           (size topic_prior0)
+                                                           (\ i10 ->
+                                                            product (nat_ 0)
+                                                                    (summate (nat_ 0)
+                                                                             (size z2)
+                                                                             (\ i丙12 ->
+                                                                              case_ (i丙12
+                                                                                     == docUpdate5)
+                                                                                    [branch ptrue
+                                                                                            (nat_ 0),
+                                                                                     branch pfalse
+                                                                                            (case_ (i10
+                                                                                                    == z2
+                                                                                                       ! i丙12)
+                                                                                                   [branch ptrue
+                                                                                                           (nat_ 1),
+                                                                                                    branch pfalse
+                                                                                                           (nat_ 0)])]))
+                                                                    (\ j11 ->
+                                                                     (nat2prob j11 +
+                                                                      topic_prior0 ! i10) *
+                                                                     recip (product (nat_ 0)
+                                                                                    (summate (nat_ 0)
+                                                                                             (size z2)
+                                                                                             (\ i丙14 ->
+                                                                                              case_ (i丙14
+                                                                                                     == docUpdate5)
+                                                                                                    [branch ptrue
+                                                                                                            (nat_ 0),
+                                                                                                     branch pfalse
+                                                                                                            (case_ (z2
+                                                                                                                    ! i丙14
+                                                                                                                    < nat_ 0)
+                                                                                                                   [branch ptrue
+                                                                                                                           (nat_ 0),
+                                                                                                                    branch pfalse
+                                                                                                                           (nat_ 1)])]))
+                                                                                    (\ i13 ->
+                                                                                     (nat2prob i13 +
+                                                                                      summate (nat_ 0)
+                                                                                              (size topic_prior0)
+                                                                                              (\ i丙15 ->
+                                                                                               topic_prior0
+                                                                                               ! i丙15)) *
+                                                                                     recip (product (nat_ 0)
+                                                                                                    (size topic_prior0)
+                                                                                                    (\ i16 ->
+                                                                                                     product (nat_ 0)
+                                                                                                             (summate (nat_ 0)
+                                                                                                                      (size w3)
+                                                                                                                      (\ i丙18 ->
+                                                                                                                       case_ (docUpdate5
+                                                                                                                              == doc4
+                                                                                                                                 ! i丙18)
+                                                                                                                             [branch ptrue
+                                                                                                                                     (nat_ 0),
+                                                                                                                              branch pfalse
+                                                                                                                                     (case_ (not (w3
+                                                                                                                                                  ! i丙18
+                                                                                                                                                  < nat_ 0) &&
+                                                                                                                                             i16
+                                                                                                                                             == z2
+                                                                                                                                                ! (doc4
+                                                                                                                                                   ! i丙18))
+                                                                                                                                            [branch ptrue
+                                                                                                                                                    (nat_ 1),
+                                                                                                                                             branch pfalse
+                                                                                                                                                    (nat_ 0)])]))
+                                                                                                             (\ i丣17 ->
+                                                                                                              nat2prob i丣17 +
+                                                                                                              summate (nat_ 0)
+                                                                                                                      (size word_prior1)
+                                                                                                                      (\ i丙19 ->
+                                                                                                                       word_prior1
+                                                                                                                       ! i丙19)))))))))))) $
+                       (categorical (array (size topic_prior0) $
+                                           \ zNew丏20 ->
+                                           product (nat_ 0)
+                                                   (size topic_prior0)
+                                                   (\ i21 ->
+                                                    product (nat_ 0)
+                                                            (size word_prior1)
+                                                            (\ i丣22 ->
+                                                             product (nat_ 0)
+                                                                     (summate (nat_ 0)
+                                                                              (size w3)
+                                                                              (\ i丙24 ->
+                                                                               case_ (docUpdate5
+                                                                                      == doc4
+                                                                                         ! i丙24)
+                                                                                     [branch ptrue
+                                                                                             (case_ (i21
+                                                                                                     == zNew丏20 &&
+                                                                                                     i丣22
+                                                                                                     == w3
+                                                                                                        ! i丙24)
+                                                                                                    [branch ptrue
+                                                                                                            (nat_ 1),
+                                                                                                     branch pfalse
+                                                                                                            (nat_ 0)]),
+                                                                                      branch pfalse
+                                                                                             (nat_ 0)]))
+                                                                     (\ j23 ->
+                                                                      (nat2prob (summate (nat_ 0)
+                                                                                         (size w3)
+                                                                                         (\ i丙25 ->
+                                                                                          case_ (doc4
+                                                                                                 ! i丙25
+                                                                                                 == docUpdate5)
+                                                                                                [branch ptrue
+                                                                                                        (nat_ 0),
+                                                                                                 branch pfalse
+                                                                                                        (case_ (i21
+                                                                                                                == z2
+                                                                                                                   ! (doc4
+                                                                                                                      ! i丙25) &&
+                                                                                                                i丣22
+                                                                                                                == w3
+                                                                                                                   ! i丙25)
+                                                                                                               [branch ptrue
+                                                                                                                       (nat_ 1),
+                                                                                                                branch pfalse
+                                                                                                                       (nat_ 0)])])) +
+                                                                       nat2prob j23 +
+                                                                       word_prior1 ! i丣22) *
+                                                                      (nat2prob (summate (nat_ 0)
+                                                                                         (size z2)
+                                                                                         (\ i丙26 ->
+                                                                                          case_ (i丙26
+                                                                                                 == docUpdate5)
+                                                                                                [branch ptrue
+                                                                                                        (nat_ 0),
+                                                                                                 branch pfalse
+                                                                                                        (case_ (zNew丏20
+                                                                                                                == z2
+                                                                                                                   ! i丙26)
+                                                                                                               [branch ptrue
+                                                                                                                       (nat_ 1),
+                                                                                                                branch pfalse
+                                                                                                                       (nat_ 0)])])) +
+                                                                       topic_prior0 ! zNew丏20) *
+                                                                      recip (nat2prob (summate (nat_ 0)
+                                                                                               (size z2)
+                                                                                               (\ i丙27 ->
+                                                                                                case_ (i丙27
+                                                                                                       == docUpdate5)
+                                                                                                      [branch ptrue
+                                                                                                              (nat_ 0),
+                                                                                                       branch pfalse
+                                                                                                              (case_ (z2
+                                                                                                                      ! i丙27
+                                                                                                                      < nat_ 0)
+                                                                                                                     [branch ptrue
+                                                                                                                             (nat_ 0),
+                                                                                                                      branch pfalse
+                                                                                                                             (nat_ 1)])])) +
+                                                                             summate (nat_ 0)
+                                                                                     (size topic_prior0)
+                                                                                     (\ i丙28 ->
+                                                                                      topic_prior0
+                                                                                      ! i丙28)) *
+                                                                      recip (product (nat_ 0)
+                                                                                     (size topic_prior0)
+                                                                                     (\ i29 ->
+                                                                                      product (nat_ 0)
+                                                                                              (summate (nat_ 0)
+                                                                                                       (size w3)
+                                                                                                       (\ i丙31 ->
+                                                                                                        case_ (docUpdate5
+                                                                                                               == doc4
+                                                                                                                  ! i丙31)
+                                                                                                              [branch ptrue
+                                                                                                                      (case_ (not (w3
+                                                                                                                                   ! i丙31
+                                                                                                                                   < nat_ 0) &&
+                                                                                                                              i29
+                                                                                                                              == zNew丏20)
+                                                                                                                             [branch ptrue
+                                                                                                                                     (nat_ 1),
+                                                                                                                              branch pfalse
+                                                                                                                                     (nat_ 0)]),
+                                                                                                               branch pfalse
+                                                                                                                      (nat_ 0)]))
+                                                                                              (\ i丣30 ->
+                                                                                               nat2prob (summate (nat_ 0)
+                                                                                                                 (size w3)
+                                                                                                                 (\ i丙32 ->
+                                                                                                                  case_ (doc4
+                                                                                                                         ! i丙32
+                                                                                                                         == docUpdate5)
+                                                                                                                        [branch ptrue
+                                                                                                                                (nat_ 0),
+                                                                                                                         branch pfalse
+                                                                                                                                (case_ (not (w3
+                                                                                                                                             ! i丙32
+                                                                                                                                             < nat_ 0) &&
+                                                                                                                                        i29
+                                                                                                                                        == z2
+                                                                                                                                           ! (doc4
+                                                                                                                                              ! i丙32))
+                                                                                                                                       [branch ptrue
+                                                                                                                                               (nat_ 1),
+                                                                                                                                        branch pfalse
+                                                                                                                                               (nat_ 0)])])) +
+                                                                                               nat2prob i丣30 +
+                                                                                               summate (nat_ 0)
+                                                                                                       (size word_prior1)
+                                                                                                       (\ i丙33 ->
+                                                                                                        word_prior1
+                                                                                                        ! i丙33))))))))))),
+         branch pfalse (reject)]
