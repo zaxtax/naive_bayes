@@ -52,9 +52,9 @@ runner = do
     labelP <- labelPrior 3 g
     sample <- unMeasure (prog vocabP labelP z w doc 1) g
     print sample
-  where z   = V.fromList []
-        w   = V.fromList []
-        doc = V.fromList []
+  where z   = V.fromList [2,1]
+        w   = V.fromList [0,1,0]
+        doc = V.fromList [0,0,1]
 
 prog = 
   lam $ \ topic_prior0 ->
