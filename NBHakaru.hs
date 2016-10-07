@@ -56,7 +56,7 @@ runner = do
     Just (z, w) <- unMeasure (generateDataset 10 4000 1000 6000 doc) g
     sample <- unMeasure (gibbs vocabP labelP z w doc 1) g
     print sample
-  where doc = V.concat $ map (\i -> V.replicate 100 i) [0..9]
+  where doc = V.concat $ map (V.replicate 100) [0..9]
 --  where doc = V.concat $ map (\i -> V.replicate 1000 i) [0..19]
 
 main = runner
