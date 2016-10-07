@@ -84,18 +84,18 @@ prog =
                branch pfalse (reject)]) $ \ naive_bayes8 ->
   naive_bayes8
 
-type HDataset = (V.Vector Integer, V.Vector Integer)
+type Label    = Int
+type Vocab    = M.Map T.Text Int
+type Features = V.Vector Integer
+type Dataset  = (Features, Label)
 
 -- Sample function to use with Hakaru-generated implementation
 sampleH
     :: Int          -- ^ Total number of iterations
     -> Int          -- ^ Total number of categories
-    -> HDataset     -- ^ Training Set
-    -> HDataset     -- ^ Testing Set
+    -> Dataset     -- ^ Training Set
+    -> Dataset     -- ^ Testing Set
     -> MWC.GenIO    -- ^ Random seed
-    -> IO HDataset  -- ^ New Testing Set
+    -> IO Dataset  -- ^ New Testing Set
 sampleH iters k train test g = undefined
   --prog vocabPrior labelPrior
-
-loadDatasetH :: S.Set String -> FilePath -> HDataset
-loadDatasetH = undefined
