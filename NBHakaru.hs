@@ -10,7 +10,6 @@ import qualified System.Random.MWC                as MWC
 import qualified System.Random.MWC.Distributions  as MWCD
 import           Control.Monad
 import qualified Data.Vector                      as V
-import qualified Data.Vector.Mutable              as MV
 import qualified Data.Set                         as S
 import qualified Data.Map.Strict                  as M
 import qualified Data.Text                        as T
