@@ -49,11 +49,11 @@ featuresToHFeatures = undefined
 runner :: IO ()
 runner = do
     g      <- MWC.createSystemRandom
-    -- Just (z, w) <- unMeasure (generateDataset 20 40000 20000 6000000 doc) g
+    -- Just (z, w) <- unMeasure (generateDataset 20 40000 20000 doc) g
     -- vocabP <- vocabPrior 40000 g
     -- labelP <- labelPrior 20 g
     start  <- getCPUTime
-    Just (z, w) <- unMeasure (generateDataset 10 4000 1000 6000 doc) g
+    Just (z, w) <- unMeasure (generateDataset 10 4000 1000 doc) g
     mid    <- getCPUTime
     printf "Time to generate data: %0.3f sec\n" (diff start mid)
     vocabP <- vocabPrior 4000 g
@@ -69,8 +69,8 @@ runner = do
 
 main = runner
 
-generateDataset = 
-  let_ (lam $ \ as1 ->
+generateDataset =
+    let_ (lam $ \ as1 ->
         (plate (unsafeNat (nat2int (size as1) +
                            negate (nat2int (nat_ 1)))) $
                \ i3 ->
@@ -88,19 +88,20 @@ generateDataset =
   let_ (lam $ \k9 ->
         lam $ \v10 ->
         lam $ \z11 ->
-        lam $ \w12 ->
-        lam $ \doc13 ->
-        let_ (array k9 $ \k15 -> prob_ 1) $ \ topic_prior14 ->
-        let_ (array v10 $ \v17 -> prob_ 1) $ \ word_prior16 ->
-        dirichlet0 `app` topic_prior14 >>= \ theta18 ->
-        (plate k9 $ \k20 -> dirichlet0 `app` word_prior16) >>= \ phi19 ->
-        (plate z11 $ \i22 -> categorical theta18) >>= \ z21 ->
-        (plate w12 $
-               \ n24 -> categorical (phi19 ! (z21 ! (doc13 ! n24)))) >>= \ w23 ->
-        dirac (ann_ (SData (STyApp (STyApp (STyCon (SingSymbol :: Sing "Pair")) (SArray SNat)) (SArray SNat)) (SPlus (SEt (SKonst (SArray SNat)) (SEt (SKonst (SArray SNat)) SDone)) SVoid))
-                    ((pair z21 w23)))) $ \ naive_bayes8 ->
+        lam $ \doc12 ->
+        let_ (array k9 $ \ k14 -> prob_ 1) $ \ topic_prior13 ->
+        let_ (array v10 $ \ v16 -> prob_ 1) $ \ word_prior15 ->
+        dirichlet0 `app` topic_prior13 >>= \ theta17 ->
+        (plate k9 $ \ k19 -> dirichlet0 `app` word_prior15) >>= \ phi18 ->
+        (plate z11 $ \ i21 -> categorical theta17) >>= \ z20 ->
+        (plate (size doc12) $
+               \ n23 -> categorical (phi18 ! (z20 ! (doc12 ! n23)))) >>= \ w22 ->
+        dirac (ann_ (SData (STyApp (STyApp (STyCon (SingSymbol :: Sing "Pair"))
+                                    (SArray SNat)) (SArray SNat))
+                     (SPlus (SEt (SKonst (SArray SNat))
+                             (SEt (SKonst (SArray SNat)) SDone)) SVoid))
+               ((pair z20 w22)))) $ \ naive_bayes8 ->
   naive_bayes8
-
 
 gibbs = 
   lam $ \ topic_prior0 ->
