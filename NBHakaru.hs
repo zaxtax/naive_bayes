@@ -49,23 +49,24 @@ featuresToHFeatures = undefined
 runner :: IO ()
 runner = do
     g      <- MWC.createSystemRandom
-    -- Just (z, w) <- unMeasure (generateDataset 20 40000 20000 doc) g
-    -- vocabP <- vocabPrior 40000 g
-    -- labelP <- labelPrior 20 g
     start  <- getCPUTime
-    Just (z, w) <- unMeasure (generateDataset 10 4000 1000 doc) g
+    Just (z, w) <- unMeasure (generateDataset k vocabSize numDocs doc) g
     mid    <- getCPUTime
     printf "Time to generate data: %0.3f sec\n" (diff start mid)
-    vocabP <- vocabPrior 4000 g
-    labelP <- labelPrior 10 g
+    vocabP <- vocabPrior vocabSize g
+    labelP <- labelPrior k g
     sample <- unMeasure (gibbs vocabP labelP z w doc 1) g
     stop   <- getCPUTime
     printf "Time to gibbs update: %0.3f sec\n" (diff mid stop)
     print sample
-  where doc = V.concat $ map (V.replicate 1000) [0..5]
+  where doc = V.concat $ map (V.replicate numDocs) [0..5] -- 300
+
         diff :: Integer -> Integer -> Double
         diff start end = (fromIntegral (end - start)) / (10^12)
---  where doc = V.concat $ map (\i -> V.replicate 1000 i) [0..19]
+
+        numDocs   = 1000  -- 20000
+        k         = 10    -- 20
+        vocabSize = 4000  -- 40000
 
 main = runner
 
