@@ -294,6 +294,6 @@ struct arrayProb fn_a(struct arrayProb topic_prior_b,
     }
     *(arr_h.data + zNew丏_i) = acc_k;
   }
-  return arr_hi;
+  return arr_h;
 }
 
