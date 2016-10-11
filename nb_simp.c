@@ -24,7 +24,12 @@ double logSumExp2(double _a, double _b)
   return (_a > _b) ? (_a + log1p((expm1((_b - _a)) + 1))) : (_b + log1p((expm1((_a - _b)) + 1)));
 }
 
-struct arrayProb fn_a(struct arrayProb topic_prior_b, struct arrayProb word_prior_c, struct arrayNat z_d, struct arrayNat w_e, struct arrayNat doc_f, unsigned int docUpdate_g)
+struct arrayProb fn_a(struct arrayProb topic_prior_b,
+		       struct arrayProb word_prior_c,
+		       struct arrayNat z_d,
+		       struct arrayNat w_e,
+		       struct arrayNat doc_f,
+		       unsigned int docUpdate_g)
 {
   struct arrayProb arr_h;
   unsigned int zNew丏_i;
@@ -289,6 +294,6 @@ struct arrayProb fn_a(struct arrayProb topic_prior_b, struct arrayProb word_prio
     }
     *(arr_h.data + zNew丏_i) = acc_k;
   }
-  return arr_h;
+  return arr_hi;
 }
 
