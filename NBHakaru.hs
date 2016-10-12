@@ -50,12 +50,6 @@ withVector :: SV.Storable a
            -> IO b
 withVector v f = with (ArrayType size v) f
    where size = SV.length v
-
--- my_scale :: Double -> SV.Vector Double -> SV.Vector Double
--- my_scale c x =
---     let size = SV.length x in
---     getV . unsafePerformIO $ do
---         with (ArrayType size x) (scale c) >>= peek
             
 instance SV.Storable a => SV.Storable (ArrayType a) where
   sizeOf _ = sizeCInt
@@ -121,20 +115,22 @@ runner = do
     g      <- MWC.createSystemRandom
     start  <- getCPUTime
     Just (z, w) <- unMeasure (generateDataset k vocabSize numDocs doc) g
-    -- mid    <- getCPUTime
+    mid    <- getCPUTime
     printf "Time to generate data: %0.3f sec\n" (diff start mid)
     vocabP <- vocabPrior (fromInteger vocabSize) g 
     labelP <- labelPrior (fromInteger k) g
-    sample <- withVector (fromVProb vocabP) $ \vocabP' ->
-              withVector (fromVProb labelP) $ \labelP' ->
-              withVector (fromVNat z) $ \z' ->
-              withVector (fromVNat w) $ \w' ->
-              withVector (fromVNat doc) $ \doc' ->
-                  gibbsC vocabP' labelP' z' w' doc' 1
-    -- sample <- unMeasure (gibbs vocabP labelP z w doc 1) g
+    -- sample <- withVector (fromVProb vocabP) $ \vocabP' ->
+    --           withVector (fromVProb labelP) $ \labelP' ->
+    --           withVector (fromVNat z) $ \z' ->
+    --           withVector (fromVNat w) $ \w' ->
+    --           withVector (fromVNat doc) $ \doc' -> do
+    --               putStrLn "Before C"
+    --               gibbsC vocabP' labelP' z' w' doc' 1
+    --               putStrLn "After C"
+    sample <- unMeasure (gibbs vocabP labelP z w doc 1) g
     stop   <- getCPUTime
     printf "Time to gibbs update: %0.3f sec\n" (diff mid stop)
-    --print sample
+    print sample
   where doc = V.concat $ map (V.replicate (fromInteger numDocs)) [0..5] -- 300
 
         diff :: Integer -> Integer -> Double
