@@ -9,6 +9,7 @@ import           Prelude                          hiding (product)
 import           Language.Hakaru.Runtime.Prelude
 import           Language.Hakaru.Types.Sing
 import           System.CPUTime
+import           System.IO.Unsafe
 import qualified System.Random.MWC                as MWC
 import qualified System.Random.MWC.Distributions  as MWCD
 import           Control.Monad
@@ -17,7 +18,59 @@ import qualified Data.Vector.Storable             as SV
 import qualified Data.Set                         as S
 import qualified Data.Map.Strict                  as M
 import qualified Data.Text                        as T
+import           Foreign
+import           Foreign.C
+import           Foreign.Ptr          (Ptr,nullPtr)
+import           Foreign.Storable
 import           Text.Printf
+
+foreign import ccall "fn_a_shim"
+    gibbsC :: ArrayStruct Double
+           -> ArrayStruct Double
+           -> ArrayStruct Int
+           -> ArrayStruct Int
+           -> ArrayStruct Int
+           -> Int
+           -> IO (ArrayStruct Double)
+
+data ArrayType a = ArrayType Int (SV.Vector a)
+  deriving (Show, Eq)
+
+getV (ArrayType _ x) = x
+ 
+type ArrayStruct a = Ptr (ArrayType a)
+
+sizeCInt  = sizeOf (undefined :: CInt)
+sizePtr   = sizeOf (undefined :: Ptr a)
+alignPtr_ = alignment (undefined :: Ptr a)
+
+-- my_scale :: Double -> SV.Vector Double -> SV.Vector Double
+-- my_scale c x =
+--     let size = SV.length x in
+--     getV . unsafePerformIO $ do
+--         with (ArrayType size x) (scale c) >>= peek
+            
+instance SV.Storable a => SV.Storable (ArrayType a) where
+  sizeOf _ = sizeCInt
+             `div` (- alignPtr_)
+                 * (- alignPtr_)
+           + sizePtr
+  alignment _ = sizePtr
+  peek ptr    = do
+      n <- peekByteOff ptr 0
+      xptr  <- peekByteOff ptr (sizeCInt                      
+                                `div` (- alignPtr_)  
+                                    * (- alignPtr_))
+      xfptr <- newForeignPtr_ xptr
+      let x = SV.unsafeFromForeignPtr0 xfptr n
+      return (ArrayType n x)
+  poke ptr (ArrayType n x) = do
+      pokeByteOff ptr 0 n
+      SV.unsafeWith x $ \xptr ->
+          pokeByteOff ptr (sizeCInt
+                           `div` (- alignPtr_)
+                                * (- alignPtr_))
+                      xptr
 
 -- this is \gamma_{\pi} in the Resnik & Hardisty paper
 labelHP :: Double
