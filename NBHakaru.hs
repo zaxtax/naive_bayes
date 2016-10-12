@@ -1,4 +1,7 @@
-{-# LANGUAGE DataKinds, NegativeLiterals, ForeignFunctionInterface #-}
+{-# LANGUAGE DataKinds
+           , NegativeLiterals
+           , ForeignFunctionInterface
+           #-}
 
 module Main where
 
@@ -10,6 +13,7 @@ import qualified System.Random.MWC                as MWC
 import qualified System.Random.MWC.Distributions  as MWCD
 import           Control.Monad
 import qualified Data.Vector                      as V
+import qualified Data.Vector.Storable             as SV
 import qualified Data.Set                         as S
 import qualified Data.Map.Strict                  as M
 import qualified Data.Text                        as T
