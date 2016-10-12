@@ -44,6 +44,13 @@ sizeCInt  = sizeOf (undefined :: CInt)
 sizePtr   = sizeOf (undefined :: Ptr a)
 alignPtr_ = alignment (undefined :: Ptr a)
 
+withVector :: SV.Storable a
+           => SV.Vector a
+           -> (ArrayStruct a -> IO b)
+           -> IO b
+withVector v f = with (ArrayType size v) f
+   where size = SV.length v
+
 -- my_scale :: Double -> SV.Vector Double -> SV.Vector Double
 -- my_scale c x =
 --     let size = SV.length x in
@@ -103,27 +110,39 @@ sampleH iters k train test g = undefined
 
 featuresToHFeatures = undefined
 
+fromVNat :: V.Vector Integer -> SV.Vector Int
+fromVNat = SV.convert . fmap fromIntegral
+
+fromVProb :: V.Vector Double -> SV.Vector Double
+fromVProb = SV.convert
+
 runner :: IO ()
 runner = do
     g      <- MWC.createSystemRandom
     start  <- getCPUTime
     Just (z, w) <- unMeasure (generateDataset k vocabSize numDocs doc) g
-    mid    <- getCPUTime
+    -- mid    <- getCPUTime
     printf "Time to generate data: %0.3f sec\n" (diff start mid)
-    vocabP <- vocabPrior (fromInteger vocabSize) g
+    vocabP <- vocabPrior (fromInteger vocabSize) g 
     labelP <- labelPrior (fromInteger k) g
-    sample <- unMeasure (gibbs vocabP labelP z w doc 1) g
+    sample <- withVector (fromVProb vocabP) $ \vocabP' ->
+              withVector (fromVProb labelP) $ \labelP' ->
+              withVector (fromVNat z) $ \z' ->
+              withVector (fromVNat w) $ \w' ->
+              withVector (fromVNat doc) $ \doc' ->
+                  gibbsC vocabP' labelP' z' w' doc' 1
+    -- sample <- unMeasure (gibbs vocabP labelP z w doc 1) g
     stop   <- getCPUTime
     printf "Time to gibbs update: %0.3f sec\n" (diff mid stop)
-    print sample
+    --print sample
   where doc = V.concat $ map (V.replicate (fromInteger numDocs)) [0..5] -- 300
 
         diff :: Integer -> Integer -> Double
         diff start end = (fromIntegral (end - start)) / (10^12)
 
-        numDocs   = 200   -- 20000
-        k         = 10    -- 20
-        vocabSize = 1000  -- 40000
+        numDocs   = 20   -- 20000
+        k         = 3    -- 20
+        vocabSize = 100  -- 40000
 
 main = runner
 
