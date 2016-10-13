@@ -19,6 +19,7 @@ import qualified Data.Vector.Mutable             as MV
 import qualified Data.Set                        as S
 import           Data.Char
 import           Control.Monad
+import           Text.Printf
 import qualified System.Random.MWC               as MWC
 import qualified System.Random.MWC.Distributions as MWCD
 import           System.Directory   (listDirectory)
@@ -283,7 +284,7 @@ sample iters k train test g post = do
 
   go 0 theta' test' = return test'
   go i theta' test' = do
-      putStr ("Iteration: " ++ show (iters - i + 1))
+      printf "Iteration: %3d" (iters - i + 1)
       (test'', theta'') <- sampleIter k theta' vocab train test' g
       post test''
       go (i-1) theta'' test''

@@ -20,7 +20,7 @@ import qualified Data.Map.Strict                  as M
 import qualified Data.Text                        as T
 import           Foreign
 import           Foreign.C
-import           Foreign.Ptr          (Ptr,nullPtr)
+import           Foreign.Ptr                      (Ptr,nullPtr)
 import           Foreign.Storable
 import           Text.Printf
 
@@ -49,7 +49,7 @@ withVector :: SV.Storable a
            -> (ArrayStruct a -> IO b)
            -> IO b
 withVector v f = with (ArrayType size v) f
-   where size = SV.length v
+    where size = SV.length v
             
 instance SV.Storable a => SV.Storable (ArrayType a) where
   sizeOf _ = sizeCInt
