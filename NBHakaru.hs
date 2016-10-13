@@ -10,6 +10,7 @@ import           Language.Hakaru.Runtime.Prelude
 import           Language.Hakaru.Types.Sing
 import           System.CPUTime
 import           Data.Time.Clock
+import           System.Environment
 import           System.IO.Unsafe
 import qualified System.Random.MWC                as MWC
 import qualified System.Random.MWC.Distributions  as MWCD
@@ -111,8 +112,12 @@ fromVNat = SV.convert . fmap fromIntegral
 fromVProb :: V.Vector Double -> SV.Vector Double
 fromVProb = SV.convert
 
-runner :: IO ()
-runner = do
+runner
+    :: Integer
+    -> Integer
+    -> Integer
+    -> IO ()
+runner numDocs k vocabSize = do
     g      <- MWC.createSystemRandom
     Just (z, w) <- time "generate data" $ do
       unMeasure (generateDataset k vocabSize numDocs doc) g
@@ -133,10 +138,9 @@ runner = do
       unMeasure (gibbs vocabP labelP z w doc 1) g
     print sample
   where doc = V.concat $ map (V.replicate (fromInteger numDocs)) [0..5] -- 300
-
-        numDocs   = 20   -- 20000
-        k         = 3    -- 20
-        vocabSize = 100  -- 40000
+        -- numDocs   = 20   -- 20000
+        -- k         = 3    -- 20
+        -- vocabSize = 100  -- 40000
 
 time :: String -> IO a -> IO a
 time label m = do
@@ -154,7 +158,11 @@ diff (cpu1, real1) (cpu2, real2)
   = printf "cpu %0.6fs, real " (fromIntegral (cpu2 - cpu1) / (10^12) :: Double)
   ++ show (diffUTCTime real2 real1)
 
-main = runner
+main = do
+  args <- getArgs
+  case map read args of
+    [numDocs, k, vocabSize] -> runner numDocs k vocabSize
+    _ -> error "NBHakaru <num docs> <k> <vocabSize>"
 
 generateDataset =
     let_ (lam $ \ as1 ->
