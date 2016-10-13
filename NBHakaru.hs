@@ -9,6 +9,7 @@ import           Prelude                          hiding (product)
 import           Language.Hakaru.Runtime.Prelude
 import           Language.Hakaru.Types.Sing
 import           System.CPUTime
+import           Data.Time.Clock
 import           System.IO.Unsafe
 import qualified System.Random.MWC                as MWC
 import qualified System.Random.MWC.Distributions  as MWCD
@@ -113,32 +114,45 @@ fromVProb = SV.convert
 runner :: IO ()
 runner = do
     g      <- MWC.createSystemRandom
-    start  <- getCPUTime
-    Just (z, w) <- unMeasure (generateDataset k vocabSize numDocs doc) g
-    mid    <- getCPUTime
-    printf "Time to generate data: %0.3f sec\n" (diff start mid)
-    vocabP <- vocabPrior (fromInteger vocabSize) g 
-    labelP <- labelPrior (fromInteger k) g
-    -- sample <- withVector (fromVProb vocabP) $ \vocabP' ->
-    --           withVector (fromVProb labelP) $ \labelP' ->
-    --           withVector (fromVNat z) $ \z' ->
-    --           withVector (fromVNat w) $ \w' ->
-    --           withVector (fromVNat doc) $ \doc' -> do
-    --               putStrLn "Before C"
-    --               gibbsC vocabP' labelP' z' w' doc' 1
-    --               putStrLn "After C"
-    sample <- unMeasure (gibbs vocabP labelP z w doc 1) g
-    stop   <- getCPUTime
-    printf "Time to gibbs update: %0.3f sec\n" (diff mid stop)
+    Just (z, w) <- time "generate data" $ do
+      unMeasure (generateDataset k vocabSize numDocs doc) g
+    sample <- time "gibbs update in C" $ do
+      vocabP <- vocabPrior (fromInteger vocabSize) g 
+      labelP <- labelPrior (fromInteger k) g
+      withVector (fromVProb vocabP) $ \vocabP' ->
+       withVector (fromVProb labelP) $ \labelP' ->
+       withVector (fromVNat z) $ \z' ->
+       withVector (fromVNat w) $ \w' ->
+       withVector (fromVNat doc) $ \doc' -> do
+           putStrLn "Before C"
+           gibbsC vocabP' labelP' z' w' doc' 1
+           putStrLn "After C"
+    sample <- time "gibbs update in Haskell" $ do
+      vocabP <- vocabPrior (fromInteger vocabSize) g 
+      labelP <- labelPrior (fromInteger k) g
+      unMeasure (gibbs vocabP labelP z w doc 1) g
     print sample
   where doc = V.concat $ map (V.replicate (fromInteger numDocs)) [0..5] -- 300
-
-        diff :: Integer -> Integer -> Double
-        diff start end = (fromIntegral (end - start)) / (10^12)
 
         numDocs   = 20   -- 20000
         k         = 3    -- 20
         vocabSize = 100  -- 40000
+
+time :: String -> IO a -> IO a
+time label m = do
+  t1 <- now
+  r  <- m
+  t2 <- now
+  putStrLn ("Time to " ++ label ++ ": " ++ diff t1 t2)
+  return r
+
+type Time = (Integer, UTCTime)
+now :: IO Time
+now = liftM2 (,) getCPUTime getCurrentTime
+diff :: Time -> Time -> String
+diff (cpu1, real1) (cpu2, real2)
+  = printf "cpu %0.6fs, real " (fromIntegral (cpu2 - cpu1) / (10^12) :: Double)
+  ++ show (diffUTCTime real2 real1)
 
 main = runner
 
