@@ -19,6 +19,9 @@ import qualified Data.Vector.Mutable             as MV
 import qualified Data.Set                        as S
 import           Data.Char
 import           Control.Monad
+
+import           Data.Time.Clock
+
 import           Text.Printf
 import qualified System.Random.MWC               as MWC
 import qualified System.Random.MWC.Distributions as MWCD
@@ -206,6 +209,23 @@ countWordFreqCategories k
 
 mkWordFreq k m = V.generate k $ \x -> M.findWithDefault M.empty x m
 
+time :: String -> IO a -> IO a
+time label m = do
+  t1 <- now
+  r  <- m
+  t2 <- now
+  putStrLn ("Time to " ++ label ++ ": " ++ diff t1 t2)
+  return r
+
+type Time = UTCTime
+
+now :: IO Time
+now = getCurrentTime
+
+diff :: Time -> Time -> String
+diff real1 real2 =
+    "real " ++ show (diffUTCTime real2 real1)
+
 sampleLabel
     :: Int                        -- ^ Total number of documents (train+test)
     -> Int                        -- ^ Total number of categories
@@ -216,7 +236,7 @@ sampleLabel
     -> MWC.GenIO                  -- ^ random seed
     -> IO Label                   -- ^ new label to assign to document
 sampleLabel n k vocab theta l wc g = do
-    MWCD.categorical labelPosterior g
+    {-time "Baseline: " $ -}MWCD.categorical labelPosterior g
     where
       categoryCounts   = countDocumentCategories k l
       docLikelihood t  = M.foldrWithKey' (\word freq acc ->
