@@ -35,8 +35,8 @@ getV (ArrayType _ x) = x
  
 type ArrayStruct a = Ptr (ArrayType a)
 
-sizeCInt  = sizeOf (undefined :: CInt)
-sizePtr   = sizeOf (undefined :: Ptr a)
+sizeCInt  = sizeOf    (undefined :: CInt)
+sizePtr   = sizeOf    (undefined :: Ptr a)
 alignPtr_ = alignment (undefined :: Ptr a)
 
 withVector :: SV.Storable a
