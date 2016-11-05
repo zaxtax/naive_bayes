@@ -11,6 +11,7 @@ import           Language.Hakaru.Runtime.Prelude
 import           Language.Hakaru.Types.Sing
 import           System.CPUTime
 import           Data.Time.Clock
+import           System.Environment
 import           System.IO.Unsafe
 import qualified System.Random.MWC                as MWC
 import qualified System.Random.MWC.Distributions  as MWCD
@@ -23,18 +24,9 @@ import qualified Data.Map.Strict                  as M
 import qualified Data.Text                        as T
 import           Foreign
 import           Foreign.C
-import           Foreign.Ptr          (Ptr,nullPtr)
+import           Foreign.Ptr                      (Ptr,nullPtr)
 import           Foreign.Storable
 import           Text.Printf
-
-foreign import ccall "fn_a_shim"
-    gibbsC :: ArrayStruct Double
-           -> ArrayStruct Double
-           -> ArrayStruct Int
-           -> ArrayStruct Int
-           -> ArrayStruct Int
-           -> Int
-           -> IO (ArrayStruct Double)
 
 data ArrayType a = ArrayType Int (SV.Vector a)
   deriving (Show, Eq)
@@ -52,7 +44,7 @@ withVector :: SV.Storable a
            -> (ArrayStruct a -> IO b)
            -> IO b
 withVector v f = with (ArrayType size v) f
-   where size = SV.length v
+    where size = SV.length v
             
 instance SV.Storable a => SV.Storable (ArrayType a) where
   sizeOf _ = sizeCInt
@@ -107,52 +99,57 @@ sampleH iters k train test g = undefined
 
 featuresToHFeatures = undefined
 
-runner :: IO ()
-runner = do
+runner
+    :: Int
+    -> Int
+    -> Int
+    -> Int
+    -> IO ()
+runner numDocs k vocabSize trial = do
     g      <- MWC.createSystemRandom
-    Just (z, w) <- time "generate data" $ do
-      unMeasure (generateDataset k vocabSize numDocs doc) g
-    sample <- time "gibbs update in C" $ do
-      vocabP <- vocabPrior vocabSize g
-      labelP <- labelPrior k g
-      withVector (G.convert vocabP) $ \vocabP' ->
-       withVector (G.convert labelP) $ \labelP' ->
-       withVector (G.convert z) $ \z' ->
-       withVector (G.convert w) $ \w' ->
-       withVector (G.convert doc) $ \doc' -> do
-           putStrLn "Before C"
-           gibbsC vocabP' labelP' z' w' doc' 1
-           putStrLn "After C"
-    sample <- time "gibbs update in Haskell" $ do
+    Just (z, w) <- unMeasure (generateDataset k vocabSize numDocs doc) g
+    -- sample <- time "gibbs update in C" $ do
+    --   vocabP <- vocabPrior vocabSize g
+    --   labelP <- labelPrior k g
+    --   withVector (G.convert vocabP) $ \vocabP' ->
+    --    withVector (G.convert labelP) $ \labelP' ->
+    --    withVector (G.convert z) $ \z' ->
+    --    withVector (G.convert w) $ \w' ->
+    --    withVector (G.convert doc) $ \doc' -> do
+    --        gibbsC vocabP' labelP' z' w' doc' 1
+    sample <- time "" $ do
+      printf "Haskell,%d,%d,%d,%d," numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
       unMeasure (gibbs (G.convert vocabP) (G.convert labelP) z w doc 1) g
-    print sample
+    --print sample
+    return ()
   where doc :: MayBoxVec Int Int
         doc = G.concat $ map (G.replicate numDocs) [0..5] -- 300
-
-        numDocs, k, vocabSize :: Int
-        numDocs   = 20   -- 20000
-        k         = 3    -- 20
-        vocabSize = 100  -- 40000
+        -- numDocs   = 20   -- 20000
+        -- k         = 3    -- 20
+        -- vocabSize = 100  -- 40000
 
 time :: String -> IO a -> IO a
 time label m = do
   t1 <- now
   r  <- m
   t2 <- now
-  putStrLn ("Time to " ++ label ++ ": " ++ diff t1 t2)
+  putStrLn (diff t1 t2)
   return r
 
-type Time = (Integer, UTCTime)
+type Time = UTCTime
 now :: IO Time
-now = liftM2 (,) getCPUTime getCurrentTime
+now = getCurrentTime
 diff :: Time -> Time -> String
-diff (cpu1, real1) (cpu2, real2)
-  = printf "cpu %0.6fs, real " (fromIntegral (cpu2 - cpu1) / (10^12) :: Double)
-  ++ show (diffUTCTime real2 real1)
+diff real1 real2
+  = show (diffUTCTime real2 real1)
 
-main = runner
+main = do
+  args <- getArgs
+  case map read args of
+    [numDocs, k, vocabSize, trial] -> runner numDocs k vocabSize trial
+    _ -> error "NBHakaru <num docs> <k> <vocabSize> <trial>"
 
 generateDataset =
     let_ (lam $ \ as1 ->
@@ -311,3 +308,4 @@ gibbs =
                                                                                  (\ i丙19 ->
                                                                                   word_prior1
                                                                                   ! i丙19))))))))
+
