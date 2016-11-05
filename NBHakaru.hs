@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds
+           , FlexibleContexts
            , NegativeLiterals
            , ForeignFunctionInterface
            #-}
@@ -15,6 +16,7 @@ import qualified System.Random.MWC                as MWC
 import qualified System.Random.MWC.Distributions  as MWCD
 import           Control.Monad
 import qualified Data.Vector                      as V
+import qualified Data.Vector.Generic              as G
 import qualified Data.Vector.Storable             as SV
 import qualified Data.Set                         as S
 import qualified Data.Map.Strict                  as M
@@ -105,35 +107,31 @@ sampleH iters k train test g = undefined
 
 featuresToHFeatures = undefined
 
-fromVNat :: V.Vector Integer -> SV.Vector Int
-fromVNat = SV.convert . fmap fromIntegral
-
-fromVProb :: V.Vector Double -> SV.Vector Double
-fromVProb = SV.convert
-
 runner :: IO ()
 runner = do
     g      <- MWC.createSystemRandom
     Just (z, w) <- time "generate data" $ do
       unMeasure (generateDataset k vocabSize numDocs doc) g
     sample <- time "gibbs update in C" $ do
-      vocabP <- vocabPrior (fromInteger vocabSize) g 
-      labelP <- labelPrior (fromInteger k) g
-      withVector (fromVProb vocabP) $ \vocabP' ->
-       withVector (fromVProb labelP) $ \labelP' ->
-       withVector (fromVNat z) $ \z' ->
-       withVector (fromVNat w) $ \w' ->
-       withVector (fromVNat doc) $ \doc' -> do
+      vocabP <- vocabPrior vocabSize g
+      labelP <- labelPrior k g
+      withVector (G.convert vocabP) $ \vocabP' ->
+       withVector (G.convert labelP) $ \labelP' ->
+       withVector (G.convert z) $ \z' ->
+       withVector (G.convert w) $ \w' ->
+       withVector (G.convert doc) $ \doc' -> do
            putStrLn "Before C"
            gibbsC vocabP' labelP' z' w' doc' 1
            putStrLn "After C"
     sample <- time "gibbs update in Haskell" $ do
-      vocabP <- vocabPrior (fromInteger vocabSize) g 
-      labelP <- labelPrior (fromInteger k) g
-      unMeasure (gibbs vocabP labelP z w doc 1) g
+      vocabP <- vocabPrior vocabSize g
+      labelP <- labelPrior k g
+      unMeasure (gibbs (G.convert vocabP) (G.convert labelP) z w doc 1) g
     print sample
-  where doc = V.concat $ map (V.replicate (fromInteger numDocs)) [0..5] -- 300
+  where doc :: MayBoxVec Int Int
+        doc = G.concat $ map (G.replicate numDocs) [0..5] -- 300
 
+        numDocs, k, vocabSize :: Int
         numDocs   = 20   -- 20000
         k         = 3    -- 20
         vocabSize = 100  -- 40000
