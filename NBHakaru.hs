@@ -97,8 +97,6 @@ sampleH
     -> IO Dataset  -- ^ New Testing Set
 sampleH iters k train test g = undefined
 
-featuresToHFeatures = undefined
-
 runner
     :: Int
     -> Int
