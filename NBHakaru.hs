@@ -87,16 +87,6 @@ type Vocab    = M.Map T.Text Int
 type Features = V.Vector Integer
 type Dataset  = (Features, Label)
 
--- Sample function to use with Hakaru-generated implementation
-sampleH
-    :: Int         -- ^ Total number of iterations
-    -> Int         -- ^ Total number of categories
-    -> Dataset     -- ^ Training Set
-    -> Dataset     -- ^ Testing Set
-    -> MWC.GenIO   -- ^ Random seed
-    -> IO Dataset  -- ^ New Testing Set
-sampleH iters k train test g = undefined
-
 runner
     :: Int
     -> Int
