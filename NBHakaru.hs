@@ -28,6 +28,15 @@ import           Foreign.Ptr                      (Ptr,nullPtr)
 import           Foreign.Storable
 import           Text.Printf
 
+foreign import ccall "fn_a_shim"
+    gibbsC :: ArrayStruct Double
+           -> ArrayStruct Double
+           -> ArrayStruct Int
+           -> ArrayStruct Int
+           -> ArrayStruct Int
+           -> Int
+           -> IO (ArrayStruct Double)
+    
 data ArrayType a = ArrayType Int (SV.Vector a)
   deriving (Show, Eq)
 
@@ -96,21 +105,21 @@ runner
 runner numDocs k vocabSize trial = do
     g      <- MWC.createSystemRandom
     Just (z, w) <- unMeasure (generateDataset k vocabSize numDocs doc) g
-    -- sample <- time "gibbs update in C" $ do
-    --   vocabP <- vocabPrior vocabSize g
-    --   labelP <- labelPrior k g
-    --   withVector (G.convert vocabP) $ \vocabP' ->
-    --    withVector (G.convert labelP) $ \labelP' ->
-    --    withVector (G.convert z) $ \z' ->
-    --    withVector (G.convert w) $ \w' ->
-    --    withVector (G.convert doc) $ \doc' -> do
-    --        gibbsC vocabP' labelP' z' w' doc' 1
+    sample <- time "" $ do
+      printf "C,%d,%d,%d,%d," numDocs k vocabSize trial
+      vocabP <- vocabPrior vocabSize g
+      labelP <- labelPrior k g
+      withVector (G.convert vocabP) $ \vocabP' ->
+       withVector (G.convert labelP) $ \labelP' ->
+        withVector (G.convert z) $ \z' ->
+         withVector (G.convert w) $ \w' ->
+          withVector (G.convert doc) $ \doc' ->
+           gibbsC vocabP' labelP' z' w' doc' 1
     sample <- time "" $ do
       printf "Haskell,%d,%d,%d,%d," numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
       unMeasure (gibbs (G.convert vocabP) (G.convert labelP) z w doc 1) g
-    --print sample
     return ()
   where doc :: MayBoxVec Int Int
         doc = G.concat $ map (G.replicate numDocs) [0..5] -- 300
