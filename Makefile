@@ -5,4 +5,4 @@ all:
 clean:
 	rm nb *.o *.hi
 run:
-	./NBHakaru 20 3 100 1
+	sh run.sh
