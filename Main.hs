@@ -21,10 +21,10 @@ labels = [ "alt.atheism"
          , "soc.religion.christian"
          ]
 
-example :: IO Double
-example = do
+example :: FilePath -> IO Double
+example datadir = do
     g  <- MWC.createSystemRandom
-    d  <- loadDataset labels "/home/zv/datasets/20_newsgroups"
+    d  <- loadDataset labels datadir
     d' <- MWCD.uniformShuffle d g
     let (train, test) = labelAwareTrainTestSplit 0.85 d'
     let ytrue = getLabels test
@@ -41,5 +41,5 @@ example = do
 main :: IO ()
 main = do
   putStrLn "Running inference for 20 Newsgroups:"
-  acc <- example
+  acc <- example "/home/zv/datasets/20_newsgroups"
   putStrLn $ printf "Accuracy on 20 Newsgroups: %.2f%%" (acc * 100)
