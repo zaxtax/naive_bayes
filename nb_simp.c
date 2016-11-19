@@ -24,292 +24,292 @@ double logSumExp2(double _a, double _b)
   return (_a > _b) ? (_a + log1p((expm1((_b - _a)) + 1))) : (_b + log1p((expm1((_a - _b)) + 1)));
 }
 
-struct arrayProb fn_a(struct arrayProb topic_prior_b, struct arrayProb word_prior_c, struct arrayNat z_d, struct arrayNat w_e, struct arrayNat doc_f, unsigned int docUpdate_g)
+struct arrayProb gibbsC(struct arrayProb topic_prior_a, struct arrayProb word_prior_b, struct arrayNat z_c, struct arrayNat w_d, struct arrayNat doc_e, unsigned int docUpdate_f)
 {
-  struct arrayProb arr_h;
-  unsigned int zNew8_i;
-  arr_h.size = topic_prior_b.size;
-  arr_h.data = ((double *)malloc((topic_prior_b.size * sizeof(double))));
-  for (zNew8_i = 0; zNew8_i < topic_prior_b.size; zNew8_i++)
+  struct arrayProb arr_g;
+  unsigned int zNew8_h;
+  arr_g.size = topic_prior_a.size;
+  arr_g.data = ((double *)malloc((topic_prior_a.size * sizeof(double))));
+  for (zNew8_h = 0; zNew8_h < topic_prior_a.size; zNew8_h++)
   {
-    unsigned int i_j;
-    double acc_k;
-    acc_k = 1;
-    for (i_j = 0; i_j < topic_prior_b.size; i_j++)
+    unsigned int i_i;
+    double acc_j;
+    acc_j = 1;
+    for (i_i = 0; i_i < topic_prior_a.size; i_i++)
     {
-      unsigned int i18_l;
-      double acc_m;
-      acc_m = 1;
-      for (i18_l = 0; i18_l < word_prior_c.size; i18_l++)
+      unsigned int i18_k;
+      double acc_l;
+      acc_l = 1;
+      for (i18_k = 0; i18_k < word_prior_b.size; i18_k++)
       {
-        unsigned int i13_n;
-        unsigned int acc_o;
-        unsigned int j_v;
-        double acc_w;
-        acc_o = 0;
-        for (i13_n = 0; i13_n < w_e.size; i13_n++)
+        unsigned int i13_m;
+        unsigned int acc_n;
+        unsigned int j_u;
+        double acc_v;
+        acc_n = 0;
+        for (i13_m = 0; i13_m < w_d.size; i13_m++)
         {
-          struct SUSUV eq_p;
-          unsigned int _q;
+          struct SUSUV eq_o;
+          unsigned int _p;
+          struct SUSUV eq_q;
           struct SUSUV eq_r;
-          struct SUSUV eq_s;
-          struct SUSUV and_t;
-          unsigned int _u;
-          eq_p.index = (docUpdate_g == *(doc_f.data + i13_n)) ? 0 : 1;
-          if (eq_p.index == 0)
+          struct SUSUV and_s;
+          unsigned int _t;
+          eq_o.index = (docUpdate_f == *(doc_e.data + i13_m)) ? 0 : 1;
+          if (eq_o.index == 0)
           {
-            eq_r.index = (i_j == zNew8_i) ? 0 : 1;
-            eq_s.index = (i18_l == *(w_e.data + i13_n)) ? 0 : 1;
-            and_t.index = !(eq_s.index == eq_r.index);
-            if (and_t.index == 0)
+            eq_q.index = (i_i == zNew8_h) ? 0 : 1;
+            eq_r.index = (i18_k == *(w_d.data + i13_m)) ? 0 : 1;
+            and_s.index = !(eq_r.index == eq_q.index);
+            if (and_s.index == 0)
             {
-              _u = 1;
+              _t = 1;
             }
-            if (and_t.index == 1)
+            if (and_s.index == 1)
             {
-              _u = 0;
+              _t = 0;
             }
-            _q = _u;
+            _p = _t;
           }
-          if (eq_p.index == 1)
+          if (eq_o.index == 1)
           {
-            _q = 0;
+            _p = 0;
           }
-          acc_o += _q;
+          acc_n += _p;
         }
-        acc_w = 1;
-        for (j_v = 0; j_v < acc_o; j_v++)
+        acc_v = 1;
+        for (j_u = 0; j_u < acc_n; j_u++)
         {
-          unsigned int i13_x;
-          unsigned int acc_y;
+          unsigned int i13_w;
+          unsigned int acc_x;
+          double p_a4;
           double p_a5;
-          double p_a6;
-          double logSumExp_a7;
-          unsigned int i13_a8;
-          unsigned int acc_a9;
-          double p_ae;
-          double logSumExp_af;
-          unsigned int i13_ag;
-          unsigned int acc_ah;
-          double p_am;
-          unsigned int i13_an;
-          double acc_ao;
-          double logSumExp_ap;
-          double recip_aq;
-          unsigned int i_ar;
-          double acc_as;
-          double recip_bi;
-          acc_y = 0;
-          for (i13_x = 0; i13_x < w_e.size; i13_x++)
+          double logSumExp_a6;
+          unsigned int i13_a7;
+          unsigned int acc_a8;
+          double p_ad;
+          double logSumExp_ae;
+          unsigned int i13_af;
+          unsigned int acc_ag;
+          double p_al;
+          unsigned int i13_am;
+          double acc_an;
+          double logSumExp_ao;
+          double recip_ap;
+          unsigned int i_aq;
+          double acc_ar;
+          double recip_bh;
+          acc_x = 0;
+          for (i13_w = 0; i13_w < w_d.size; i13_w++)
           {
-            struct SUSUV eq_z;
-            unsigned int _a0;
+            struct SUSUV eq_y;
+            unsigned int _z;
+            struct SUSUV eq_a0;
             struct SUSUV eq_a1;
-            struct SUSUV eq_a2;
-            struct SUSUV and_a3;
-            unsigned int _a4;
-            eq_z.index = (*(doc_f.data + i13_x) == docUpdate_g) ? 0 : 1;
-            if (eq_z.index == 0)
+            struct SUSUV and_a2;
+            unsigned int _a3;
+            eq_y.index = (*(doc_e.data + i13_w) == docUpdate_f) ? 0 : 1;
+            if (eq_y.index == 0)
             {
-              _a0 = 0;
+              _z = 0;
             }
-            if (eq_z.index == 1)
+            if (eq_y.index == 1)
             {
-              eq_a1.index = (i_j == *(z_d.data + *(doc_f.data + i13_x))) ? 0 : 1;
-              eq_a2.index = (i18_l == *(w_e.data + i13_x)) ? 0 : 1;
-              and_a3.index = !(eq_a2.index == eq_a1.index);
-              if (and_a3.index == 0)
+              eq_a0.index = (i_i == *(z_c.data + *(doc_e.data + i13_w))) ? 0 : 1;
+              eq_a1.index = (i18_k == *(w_d.data + i13_w)) ? 0 : 1;
+              and_a2.index = !(eq_a1.index == eq_a0.index);
+              if (and_a2.index == 0)
               {
-                _a4 = 1;
+                _a3 = 1;
               }
-              if (and_a3.index == 1)
+              if (and_a2.index == 1)
               {
-                _a4 = 0;
+                _a3 = 0;
               }
-              _a0 = _a4;
+              _z = _a3;
             }
-            acc_y += _a0;
+            acc_x += _z;
           }
-          p_a5 = log1p((acc_y - 1));
-          p_a6 = log1p((j_v - 1));
-          logSumExp_a7 = logSumExp3(p_a5,p_a6,*(word_prior_c.data + i18_l));
-          acc_a9 = 0;
-          for (i13_a8 = 0; i13_a8 < z_d.size; i13_a8++)
+          p_a4 = log1p((acc_x - 1));
+          p_a5 = log1p((j_u - 1));
+          logSumExp_a6 = logSumExp3(p_a4,p_a5,*(word_prior_b.data + i18_k));
+          acc_a8 = 0;
+          for (i13_a7 = 0; i13_a7 < z_c.size; i13_a7++)
           {
-            struct SUSUV eq_aa;
-            unsigned int _ab;
-            struct SUSUV eq_ac;
-            unsigned int _ad;
-            eq_aa.index = (i13_a8 == docUpdate_g) ? 0 : 1;
-            if (eq_aa.index == 0)
+            struct SUSUV eq_a9;
+            unsigned int _aa;
+            struct SUSUV eq_ab;
+            unsigned int _ac;
+            eq_a9.index = (i13_a7 == docUpdate_f) ? 0 : 1;
+            if (eq_a9.index == 0)
             {
-              _ab = 0;
+              _aa = 0;
             }
-            if (eq_aa.index == 1)
+            if (eq_a9.index == 1)
             {
-              eq_ac.index = (zNew8_i == *(z_d.data + i13_a8)) ? 0 : 1;
-              if (eq_ac.index == 0)
+              eq_ab.index = (zNew8_h == *(z_c.data + i13_a7)) ? 0 : 1;
+              if (eq_ab.index == 0)
               {
-                _ad = 1;
+                _ac = 1;
               }
-              if (eq_ac.index == 1)
+              if (eq_ab.index == 1)
               {
-                _ad = 0;
+                _ac = 0;
               }
-              _ab = _ad;
+              _aa = _ac;
             }
-            acc_a9 += _ab;
+            acc_a8 += _aa;
           }
-          p_ae = log1p((acc_a9 - 1));
-          logSumExp_af = logSumExp2(p_ae,*(topic_prior_b.data + zNew8_i));
-          acc_ah = 0;
-          for (i13_ag = 0; i13_ag < z_d.size; i13_ag++)
+          p_ad = log1p((acc_a8 - 1));
+          logSumExp_ae = logSumExp2(p_ad,*(topic_prior_a.data + zNew8_h));
+          acc_ag = 0;
+          for (i13_af = 0; i13_af < z_c.size; i13_af++)
           {
-            struct SUSUV eq_ai;
-            unsigned int _aj;
-            struct SUSUV less_ak;
-            unsigned int _al;
-            eq_ai.index = (i13_ag == docUpdate_g) ? 0 : 1;
-            if (eq_ai.index == 0)
+            struct SUSUV eq_ah;
+            unsigned int _ai;
+            struct SUSUV less_aj;
+            unsigned int _ak;
+            eq_ah.index = (i13_af == docUpdate_f) ? 0 : 1;
+            if (eq_ah.index == 0)
             {
-              _aj = 0;
+              _ai = 0;
             }
-            if (eq_ai.index == 1)
+            if (eq_ah.index == 1)
             {
-              less_ak.index = (*(z_d.data + i13_ag) < 0) ? 0 : 1;
-              if (less_ak.index == 0)
+              less_aj.index = (*(z_c.data + i13_af) < 0) ? 0 : 1;
+              if (less_aj.index == 0)
               {
-                _al = 0;
+                _ak = 0;
               }
-              if (less_ak.index == 1)
+              if (less_aj.index == 1)
               {
-                _al = 1;
+                _ak = 1;
               }
-              _aj = _al;
+              _ai = _ak;
             }
-            acc_ah += _aj;
+            acc_ag += _ai;
           }
-          p_am = log1p((acc_ah - 1));
-          acc_ao = 0;
-          for (i13_an = 0; i13_an < topic_prior_b.size; i13_an++)
+          p_al = log1p((acc_ag - 1));
+          acc_an = 0;
+          for (i13_am = 0; i13_am < topic_prior_a.size; i13_am++)
           {
-            acc_ao += *(topic_prior_b.data + i13_an);
+            acc_an += *(topic_prior_a.data + i13_am);
           }
-          logSumExp_ap = logSumExp2(p_am,acc_ao);
-          recip_aq = -logSumExp_ap;
-          acc_as = 1;
-          for (i_ar = 0; i_ar < topic_prior_b.size; i_ar++)
+          logSumExp_ao = logSumExp2(p_al,acc_an);
+          recip_ap = -logSumExp_ao;
+          acc_ar = 1;
+          for (i_aq = 0; i_aq < topic_prior_a.size; i_aq++)
           {
-            unsigned int i13_at;
-            unsigned int acc_au;
-            unsigned int i18_b2;
-            double acc_b3;
-            acc_au = 0;
-            for (i13_at = 0; i13_at < w_e.size; i13_at++)
+            unsigned int i13_as;
+            unsigned int acc_at;
+            unsigned int i18_b1;
+            double acc_b2;
+            acc_at = 0;
+            for (i13_as = 0; i13_as < w_d.size; i13_as++)
             {
-              struct SUSUV eq_av;
-              unsigned int _aw;
-              struct SUSUV less_ay;
-              struct SUSUV eq_az;
-              struct SUSUV and_b0;
-              unsigned int _b1;
-              eq_av.index = (docUpdate_g == *(doc_f.data + i13_at)) ? 0 : 1;
-              if (eq_av.index == 0)
+              struct SUSUV eq_au;
+              unsigned int _av;
+              struct SUSUV less_ax;
+              struct SUSUV eq_ay;
+              struct SUSUV and_az;
+              unsigned int _b0;
+              eq_au.index = (docUpdate_f == *(doc_e.data + i13_as)) ? 0 : 1;
+              if (eq_au.index == 0)
               {
-                less_ay.index = (*(w_e.data + i13_at) < 0) ? 0 : 1;
-                less_ay.index = (less_ay.index == 1) ? 0 : 1;
-                eq_az.index = (i_ar == zNew8_i) ? 0 : 1;
-                and_b0.index = !(eq_az.index == less_ay.index);
-                if (and_b0.index == 0)
+                less_ax.index = (*(w_d.data + i13_as) < 0) ? 0 : 1;
+                less_ax.index = (less_ax.index == 1) ? 0 : 1;
+                eq_ay.index = (i_aq == zNew8_h) ? 0 : 1;
+                and_az.index = !(eq_ay.index == less_ax.index);
+                if (and_az.index == 0)
                 {
-                  _b1 = 1;
+                  _b0 = 1;
                 }
-                if (and_b0.index == 1)
+                if (and_az.index == 1)
                 {
-                  _b1 = 0;
+                  _b0 = 0;
                 }
-                _aw = _b1;
+                _av = _b0;
               }
-              if (eq_av.index == 1)
+              if (eq_au.index == 1)
               {
-                _aw = 0;
+                _av = 0;
               }
-              acc_au += _aw;
+              acc_at += _av;
             }
-            acc_b3 = 1;
-            for (i18_b2 = 0; i18_b2 < acc_au; i18_b2++)
+            acc_b2 = 1;
+            for (i18_b1 = 0; i18_b1 < acc_at; i18_b1++)
             {
-              unsigned int i13_b4;
-              unsigned int acc_b5;
+              unsigned int i13_b3;
+              unsigned int acc_b4;
+              double p_bc;
               double p_bd;
-              double p_be;
-              unsigned int i13_bf;
-              double acc_bg;
-              double logSumExp_bh;
-              acc_b5 = 0;
-              for (i13_b4 = 0; i13_b4 < w_e.size; i13_b4++)
+              unsigned int i13_be;
+              double acc_bf;
+              double logSumExp_bg;
+              acc_b4 = 0;
+              for (i13_b3 = 0; i13_b3 < w_d.size; i13_b3++)
               {
-                struct SUSUV eq_b6;
-                unsigned int _b7;
-                struct SUSUV less_b9;
-                struct SUSUV eq_ba;
-                struct SUSUV and_bb;
-                unsigned int _bc;
-                eq_b6.index = (*(doc_f.data + i13_b4) == docUpdate_g) ? 0 : 1;
-                if (eq_b6.index == 0)
+                struct SUSUV eq_b5;
+                unsigned int _b6;
+                struct SUSUV less_b8;
+                struct SUSUV eq_b9;
+                struct SUSUV and_ba;
+                unsigned int _bb;
+                eq_b5.index = (*(doc_e.data + i13_b3) == docUpdate_f) ? 0 : 1;
+                if (eq_b5.index == 0)
                 {
-                  _b7 = 0;
+                  _b6 = 0;
                 }
-                if (eq_b6.index == 1)
+                if (eq_b5.index == 1)
                 {
-                  less_b9.index = (*(w_e.data + i13_b4) < 0) ? 0 : 1;
-                  less_b9.index = (less_b9.index == 1) ? 0 : 1;
-                  eq_ba.index = (i_ar == *(z_d.data + *(doc_f.data + i13_b4))) ? 0 : 1;
-                  and_bb.index = !(eq_ba.index == less_b9.index);
-                  if (and_bb.index == 0)
+                  less_b8.index = (*(w_d.data + i13_b3) < 0) ? 0 : 1;
+                  less_b8.index = (less_b8.index == 1) ? 0 : 1;
+                  eq_b9.index = (i_aq == *(z_c.data + *(doc_e.data + i13_b3))) ? 0 : 1;
+                  and_ba.index = !(eq_b9.index == less_b8.index);
+                  if (and_ba.index == 0)
                   {
-                    _bc = 1;
+                    _bb = 1;
                   }
-                  if (and_bb.index == 1)
+                  if (and_ba.index == 1)
                   {
-                    _bc = 0;
+                    _bb = 0;
                   }
-                  _b7 = _bc;
+                  _b6 = _bb;
                 }
-                acc_b5 += _b7;
+                acc_b4 += _b6;
               }
-              p_bd = log1p((acc_b5 - 1));
-              p_be = log1p((i18_b2 - 1));
-              acc_bg = 0;
-              for (i13_bf = 0; i13_bf < word_prior_c.size; i13_bf++)
+              p_bc = log1p((acc_b4 - 1));
+              p_bd = log1p((i18_b1 - 1));
+              acc_bf = 0;
+              for (i13_be = 0; i13_be < word_prior_b.size; i13_be++)
               {
-                acc_bg += *(word_prior_c.data + i13_bf);
+                acc_bf += *(word_prior_b.data + i13_be);
               }
-              logSumExp_bh = logSumExp3(p_bd,p_be,acc_bg);
-              acc_b3 += logSumExp_bh;
+              logSumExp_bg = logSumExp3(p_bc,p_bd,acc_bf);
+              acc_b2 += logSumExp_bg;
             }
-            acc_as += acc_b3;
+            acc_ar += acc_b2;
           }
-          recip_bi = -acc_as;
-          acc_w += (logSumExp_af + (recip_aq + (recip_bi + logSumExp_a7)));
+          recip_bh = -acc_ar;
+          acc_v += (logSumExp_ae + (recip_ap + (recip_bh + logSumExp_a6)));
         }
-        acc_m += acc_w;
+        acc_l += acc_v;
       }
-      acc_k += acc_m;
+      acc_j += acc_l;
     }
-    *(arr_h.data + zNew8_i) = acc_k;
+    *(arr_g.data + zNew8_h) = acc_j;
   }
-  return arr_h;
+  return arr_g;
 }
 
-struct arrayProb* fn_a_shim(struct arrayProb* topic_prior_b,
-                struct arrayProb* word_prior_c,
-                struct arrayNat* z_d,
-                struct arrayNat* w_e,
-                struct arrayNat* doc_f,
-                unsigned int docUpdate_g)
+struct arrayProb* gibbsC_shim(struct arrayProb* topic_prior_b,
+			    struct arrayProb* word_prior_c,
+			    struct arrayNat* z_d,
+			    struct arrayNat* w_e,
+			    struct arrayNat* doc_f,
+			    unsigned int docUpdate_g)
 {
   struct arrayProb* res = (struct arrayProb*)malloc(sizeof(struct arrayProb*));
-  *res = fn_a(*topic_prior_b, *word_prior_c, *z_d, *w_e, *doc_f, docUpdate_g);
+  *res = gibbsC(*topic_prior_b, *word_prior_c, *z_d, *w_e, *doc_f, docUpdate_g);
   return res;
 }

@@ -28,7 +28,7 @@ import           Foreign.Ptr                      (Ptr,nullPtr)
 import           Foreign.Storable
 import           Text.Printf
 
-foreign import ccall "fn_a_shim"
+foreign import ccall "gibbsC_shim"
     gibbsC :: ArrayStruct Double
            -> ArrayStruct Double
            -> ArrayStruct Int
