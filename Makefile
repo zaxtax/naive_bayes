@@ -5,7 +5,7 @@ all:
 	ghc -O2 nb_simp.o --make NBHakaru.hs # Haskell and C
 	ghc --make Main.hs -O2 -o nb # Baseline
 clean:
-	rm nb *.o *.hi
+	rm NBHakaru nb *.o *.hi nb_simp.c
 run:
 	sh run.sh
 
