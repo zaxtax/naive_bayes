@@ -3,7 +3,7 @@
 echo "Running Baseline"
 ./nb
 
-echo "Running Gibbs update"
+echo "Running Gibbs updates"
 ./NBHakaru 10 3 100 1
 ./NBHakaru 10 3 100 2
 ./NBHakaru 10 3 100 3
