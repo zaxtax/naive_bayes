@@ -3,10 +3,12 @@ fn topic_prior array(prob):
   fn z array(nat): 
    fn w array(nat): 
     fn doc array(nat): 
-     fn docUpdate nat: 
-         (array zNew8 of size(topic_prior): 
-                             (product i from 0 to size(topic_prior): 
-                               product i18 from 0 to size(word_prior): 
+     fn docUpdate nat:
+         topic_prior_size = size(topic_prior)
+	 word_prior_size  = size(word_prior)
+         (array zNew8 of topic_prior_size: 
+                             (product i from 0 to topic_prior_size: 
+                               product i18 from 0 to word_prior_size: 
                                 product j from 0 to summate i13 from 0 to size(w): 
                                                      (match (docUpdate == doc[i13]): 
                                                        true: 
@@ -44,9 +46,9 @@ fn topic_prior array(prob):
                                               true: 0
                                               false: 1)))
                                 + 
-                               summate i13 from 0 to size(topic_prior): topic_prior[i13])
+                               summate i13 from 0 to topic_prior_size: topic_prior[i13])
                                / 
-                              product i from 0 to size(topic_prior): 
+                              product i from 0 to topic_prior_size: 
                                product i18 from 0 to summate i13 from 0 to size(w): 
                                                       (match (docUpdate == doc[i13]): 
                                                         true: 
@@ -65,4 +67,4 @@ fn topic_prior array(prob):
                                   + 
                                  nat2prob(i18)
                                   + 
-                                 summate i13 from 0 to size(word_prior): word_prior[i13])))
+                                 summate i13 from 0 to word_prior_size: word_prior[i13])))
