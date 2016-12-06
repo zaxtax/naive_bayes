@@ -132,7 +132,7 @@ time label m = do
   t1 <- now
   r  <- m
   t2 <- now
-  putStrLn (diff t1 t2)
+  putStrLn $ filter (/= 's') (diff t1 t2)
   return r
 
 type Time = UTCTime
