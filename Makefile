@@ -8,4 +8,5 @@ clean:
 	rm NBHakaru nb *.o *.hi nb_simp.c
 run:
 	sh run.sh
-
+%.hs : %.hk
+	compile $<
