@@ -10,3 +10,5 @@ run:
 	sh run.sh
 %.hs : %.hk
 	compile $<
+%.core : %.hs
+	ghc -O2 -ddump-simpl -dverbose-core2core $< nb_simp.o > $@
