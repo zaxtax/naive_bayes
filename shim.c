@@ -1,3 +1,5 @@
+// Shim so NBHakaru file does not need to be changed with Hakaru code is changed
+
 struct arrayProb* gibbsC_shim(struct arrayProb* topic_prior_b,
 			    struct arrayProb* word_prior_c,
 			    struct arrayNat* z_d,
