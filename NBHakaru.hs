@@ -106,20 +106,21 @@ runner numDocs k vocabSize trial = do
     g      <- MWC.createSystemRandom
     Just (z, w) <- unMeasure (generateDataset k vocabSize numDocs doc) g
     sample <- time "" $ do
-      printf "C,%d,%d,%d,%d," numDocs k vocabSize trial
+      printf "C,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
       withVector (G.convert vocabP) $ \vocabP' ->
        withVector (G.convert labelP) $ \labelP' ->
         withVector (G.convert z) $ \z' ->
          withVector (G.convert w) $ \w' ->
-          withVector (G.convert doc) $ \doc' ->
-           gibbsC vocabP' labelP' z' w' doc' 1
+          withVector (G.convert doc) $ \doc' -> do
+           r <- gibbsC vocabP' labelP' z' w' doc' 1
+           peek r >>= print
     sample <- time "" $ do
-      printf "Haskell,%d,%d,%d,%d," numDocs k vocabSize trial
+      printf "Haskell,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
-      unMeasure (gibbs (G.convert vocabP) (G.convert labelP) z w doc 1) g
+      print (gibbs (G.convert vocabP) (G.convert labelP) z w doc 1)
     return ()
   where doc :: MayBoxVec Int Int
         doc = G.concat $ map (G.replicate numDocs) [0..5] -- 300
@@ -189,7 +190,7 @@ gibbs =
   lam $ \ w3 ->
   lam $ \ doc4 ->
   lam $ \ docUpdate5 ->
-  categorical (array (size topic_prior0) $
+  (array (size topic_prior0) $
                      \ zNew丏6 ->
                      product (nat_ 0)
                              (size topic_prior0)
