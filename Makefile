@@ -3,7 +3,7 @@ SANDBOX_OPTIONS = -no-user-package-db -package-db .cabal-sandbox/x86_64-linux-gh
 all:
 	hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
 	cat shim.c >> nb_simp.c
-	gcc -Ofast -c nb_simp.c
+	gcc -O3 -c nb_simp.c
 	ghc -O2 nb_simp.o --make NBHakaru.hs # Haskell and C
 	ghc --make Main.hs -O2 -o nb # Baseline
 
