@@ -1,4 +1,5 @@
-SANDBOX_OPTIONS = -no-user-package-db -package-db .cabal-sandbox/x86_64-linux-ghc-8.0.1-packages.conf.d
+SANDBOX_PATH = $(shell find .cabal-sandbox -name "*-packages.conf.d")
+SANDBOX_OPTIONS = -no-user-package-db -package-db $(SANDBOX_PATH)
 
 all:
 	hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
