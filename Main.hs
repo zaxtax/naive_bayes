@@ -41,5 +41,5 @@ example datadir = do
 main :: IO ()
 main = do
   putStrLn "Running inference for 20 Newsgroups:"
-  acc <- example "/home/zv/datasets/20_newsgroups"
+  acc <- example "./20_newsgroups/"
   putStrLn $ printf "Accuracy on 20 Newsgroups: %.2f%%" (acc * 100)
