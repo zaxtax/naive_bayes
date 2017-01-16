@@ -17,3 +17,5 @@ cabal.sandbox.config
 *.eventlog
 .stack-work/
 cabal.project.local
+20_newsgroups/
+20news-19997.tar.gz
