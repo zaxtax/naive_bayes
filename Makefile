@@ -28,4 +28,4 @@ run:
 	compile $<
 
 %.core : %.hs
-	ghc -O2 -ddump-simpl -dverbose-core2core $< nb_simp.o > $@
+	ghc -O2 -ddump-simpl -dverbose-core2core -dppr-cols200 $< nb_simp.o > $@
