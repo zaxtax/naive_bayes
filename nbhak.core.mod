@@ -9672,9 +9672,9 @@ gibbs =
       lvl103_shTb =
         case topic_prior_length of _ [Occ=Dead] { I# ww3_agDQ ->
         let {
-          y_ahgy [Dmd=<S,U>] :: Int#
+          topic_prior_len_sub1 [Dmd=<S,U>] :: Int#
 
-          y_ahgy = -# ww3_agDQ 1# } in
+          topic_prior_len_sub1 = -# ww3_agDQ 1# } in
         case tagToEnum# @ Bool (># 0# topic_prior_length_)
         of _ [Occ=Dead] {
           False ->
@@ -9693,8 +9693,8 @@ gibbs =
                         True ->
                           case topic_prior0_abXa `cast` ...
                           of _ [Occ=Dead]
-                          { Data.Vector.Primitive.Vector dt_ajiC dt1_ajiD dt2_ajiE ->
-                          indexDoubleArray# dt2_ajiE (+# dt_ajiC ww_syq4)
+                          { Data.Vector.Primitive.Vector dt_offset dt_len dt_bytearray ->
+                          indexDoubleArray# dt_bytearray (+# dt_offset ww_syq4)
                           }
                       }
                   } } in
@@ -9754,8 +9754,8 @@ gibbs =
                           True ->
                             case word_prior1_abXb `cast` ...
                             of _ [Occ=Dead]
-                            { Data.Vector.Primitive.Vector dt_ajiC dt1_ajiD dt2_ajiE ->
-                            indexDoubleArray# dt2_ajiE (+# dt_ajiC ww_syqn)
+                            { Data.Vector.Primitive.Vector dt_offset dt_len dt_bytearray ->
+                            indexDoubleArray# dt_bytearray (+# dt_offset ww_syqn)
                             }
                         }
                     } } in
@@ -9950,10 +9950,10 @@ gibbs =
                                          True ->
                                            case topic_prior0_abXa `cast` ...
                                            of _ [Occ=Dead]
-                                           { Data.Vector.Primitive.Vector dt_ajiC dt1_ajiD
-                                                                          dt2_ajiE ->
+                                           { Data.Vector.Primitive.Vector dt_offset dt_len
+                                                                          dt_bytearray ->
                                            case indexDoubleArray#
-                                                  dt2_ajiE (+# dt_ajiC x_ahkY)
+                                                  dt_bytearray (+# dt_offset x_ahkY)
                                            of wild5_ajiO { __DEFAULT ->
                                            +## (int2Double# w1_syrI) wild5_ajiO
                                            }
@@ -10614,9 +10614,9 @@ gibbs =
                                                          True ->
                                                            case word_prior1_abXb `cast` ...
                                                            of _ [Occ=Dead]
-                                                           { Data.Vector.Primitive.Vector dt_ajiC
-                                                                                          dt1_ajiD
-                                                                                          dt2_ajiE ->
+                                                           { Data.Vector.Primitive.Vector dt_offset
+                                                                                          dt_len
+                                                                                          dt_bytearray ->
                                                            let {
                                                              y4_XhqR [Dmd=<S,U>] :: Int#
 
@@ -10630,9 +10630,9 @@ gibbs =
                                                                \ (ww6_sysf [OS=OneShot]
                                                                     :: Double#) ->
                                                                  case indexDoubleArray#
-                                                                        dt2_ajiE
+                                                                        dt_bytearray
                                                                         (+#
-                                                                           dt_ajiC sc1_sEol)
+                                                                           dt_offset sc1_sEol)
                                                                  of wild6_ajiO { __DEFAULT ->
                                                                  case lvl110_shSS
                                                                  of _ [Occ=Dead]
