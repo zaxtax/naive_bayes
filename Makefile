@@ -6,7 +6,7 @@ all: data-file
 	cat shim.c >> nb_simp.c
 	gcc -O3 -c nb_simp.c
 	ghc -O2 nb_simp.o --make NBHakaru.hs # Haskell and C
-	ghc --make Main.hs -O2 -o nb # Baseline
+	ghc -main-is Baseline Baseline -O2 -o nb # Baseline
 
 all-sandbox: data-file
 	#hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
