@@ -3,9 +3,8 @@ SANDBOX_OPTIONS = -no-user-package-db -package-db $(SANDBOX_PATH)
 
 all: data-file
 	hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
-	cat shim.c >> nb_simp.c
-	gcc -O3 -c nb_simp.c
-	ghc -O2 nb_simp.o --make NBHakaru.hs # Haskell and C
+	gcc -O3 -c gibbs.c
+	ghc -O2 gibbs.o --make NBHakaru.hs # Haskell and C
 	ghc -main-is Baseline Baseline -O2 -o nb # Baseline
 
 all-sandbox: data-file
