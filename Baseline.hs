@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedLists  #-}
 
-module Baseline where
+module Main where
 
 import           NaiveBayes
 import qualified Data.Set                        as S
