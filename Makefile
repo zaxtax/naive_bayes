@@ -5,13 +5,13 @@ all: data-file
 	hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
 	gcc -O3 -c gibbs.c
 	ghc -O2 gibbs.o --make NBHakaru.hs # Haskell and C
-	ghc -main-is Baseline Baseline -O2 -o nb # Baseline
+	ghc Baseline.hs -O2 -o nb # Baseline
 
 all-sandbox: data-file
 	hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
 	gcc -O3 -g -c gibbs.c
 	ghc -O2 gibbs.o $(SANDBOX_OPTIONS) NBHakaru.hs # Haskell and C
-	ghc -main-is Baseline Baseline -O2 $(SANDBOX_OPTIONS) -o nb # Baseline
+	ghc Baseline.hs -O2 $(SANDBOX_OPTIONS) -o nb # Baseline
 
 data-file:
 	bash ./download-data.sh
