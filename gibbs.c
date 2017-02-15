@@ -1,13 +1,13 @@
 #include "nb_simp.c"
 
-struct arrayProb* gibbsC_shim(struct arrayProb* topic_prior_b,
-                struct arrayProb* word_prior_c,
-                struct arrayNat* z_d,
-                struct arrayNat* w_e,
-                struct arrayNat* doc_f,
+struct arrayProb* gibbsC_shim(struct array_prob* topic_prior_b,
+                struct array_prob* word_prior_c,
+                struct array_nat* z_d,
+                struct array_nat* w_e,
+                struct array_nat* doc_f,
                 unsigned int docUpdate_g)
 {
-  struct arrayProb* res = (struct arrayProb*)malloc(sizeof(struct arrayProb));
+  struct array_prob* res = (struct array_prob*)malloc(sizeof(struct array_prob));
   *res = gibbsC(*topic_prior_b, *word_prior_c, *z_d, *w_e, *doc_f, docUpdate_g);
   return res;
 }
