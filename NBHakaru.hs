@@ -124,6 +124,11 @@ runner numDocs k vocabSize trial = do
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
       print (gibbs (G.convert vocabP) (G.convert labelP) z w doc 1)
+    sample <- time "" $ do
+      printf "Haskell-Opt,%d,%d,%d,%d,\n" numDocs k vocabSize trial
+      vocabP <- vocabPrior vocabSize g
+      labelP <- labelPrior k g
+      print (gibbsOpt (G.convert vocabP) (G.convert labelP) z w doc 1)
     return ()
   where doc :: MayBoxVec Int Int
         doc = G.concat $ map (G.replicate numDocs) [0..5] -- 300
