@@ -19,7 +19,7 @@ data-file:
 	bash ./download-data.sh
 
 clean:
-	rm NBHakaru nb *.o *.hi nb_simp.c *.core
+	rm NBHakaru nb *.o *.hi nb_simp.hk nb_simp.c *.core
 
 run:
 	sh run.sh
