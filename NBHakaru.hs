@@ -6,8 +6,8 @@
 
 module Main where
 
-import           Prelude                          hiding (product)
-import           Language.Hakaru.Runtime.Prelude
+import           Prelude                          hiding (product, exp, log, (**))
+import           Language.Hakaru.Runtime.LogFloatPrelude
 import           Language.Hakaru.Types.Sing
 import           System.CPUTime
 import           Data.Time.Clock
@@ -19,6 +19,7 @@ import           Control.Monad
 import qualified Data.Vector                      as V
 import qualified Data.Vector.Generic              as G
 import qualified Data.Vector.Storable             as SV
+import qualified Data.Number.LogFloat             as LF
 import qualified Data.Set                         as S
 import qualified Data.Map.Strict                  as M
 import qualified Data.Text                        as T
@@ -121,8 +122,8 @@ runner numDocs k vocabSize trial = do
            peek r >>= print
     sample <- time "" $ do
       printf "Haskell,%d,%d,%d,%d,\n" numDocs k vocabSize trial
-      vocabP <- vocabPrior vocabSize g
-      labelP <- labelPrior k g
+      vocabP <- G.map LF.logFloat <$> vocabPrior vocabSize g
+      labelP <- G.map LF.logFloat <$> labelPrior k g
       print (gibbs (G.convert vocabP) (G.convert labelP) z w doc 1)
     sample <- time "" $ do
       printf "Haskell-Opt,%d,%d,%d,%d,\n" numDocs k vocabSize trial
