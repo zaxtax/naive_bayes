@@ -31,7 +31,7 @@ import           Text.Printf
 
 import Gibbs
 import GibbsOpt
-import GibbsOptBucket
+import qualified GibbsOptBucket
 
 foreign import ccall "gibbsC_shim"
     gibbsC :: ArrayStruct Double
@@ -110,7 +110,7 @@ runner
 runner numDocs k vocabSize trial = do
     g      <- MWC.createSystemRandom
     Just (z, w) <- unMeasure (generateDataset k vocabSize numDocs doc) g
-    {-sample <- time "" $ do
+    sample <- time "" $ do
       printf "C,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
@@ -120,7 +120,7 @@ runner numDocs k vocabSize trial = do
          withVector (G.convert w) $ \w' ->
           withVector (G.convert doc) $ \doc' -> do
            r <- gibbsC vocabP' labelP' z' w' doc' 1
-           peek r >>= print-}
+           peek r >>= print
     sample <- time "" $ do
       printf "Haskell,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- G.map LF.logFloat <$> vocabPrior vocabSize g
@@ -135,7 +135,7 @@ runner numDocs k vocabSize trial = do
       printf "Haskell-Opt-Bucket,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
-      print (G.length $ gibbsOptBucket (G.convert vocabP) (G.convert labelP) z w doc 1)
+      print (G.length $ GibbsOptBucket.prog (G.convert vocabP) (G.convert labelP) z w doc 1)
     return ()
   where doc :: MayBoxVec Int Int
         doc = G.concat $ map (G.replicate numDocs) [0..5] -- 300

@@ -5,6 +5,7 @@ all: data-file
 	simplify naive_bayes_gibbs.hk > nb_simp.hk
 	hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
 	gcc -O3 -c gibbs.c
+	summary nb_simp.hk -o GibbsOptBucket.hs -M GibbsOptBucket
 	ghc -O2 gibbs.o --make NBHakaru.hs # Haskell and C
 	ghc Baseline.hs -O2 -o nb # Baseline
 
@@ -12,6 +13,7 @@ all-sandbox: data-file
 	simplify naive_bayes_gibbs.hk > nb_simp.hk
 	hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
 	gcc -O3 -g -c gibbs.c
+	summary nb_simp.hk -o GibbsOptBucket.hs -M GibbsOptBucket
 	ghc -O2 gibbs.o $(SANDBOX_OPTIONS) NBHakaru.hs # Haskell and C
 	ghc Baseline.hs -O2 $(SANDBOX_OPTIONS) -o nb # Baseline
 
