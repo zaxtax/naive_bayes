@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, NegativeLiterals #-}
 module GibbsOptBucket where
 
-import           Prelude                          hiding (product)
+import           Prelude hiding (product)
 import           Language.Hakaru.Runtime.Prelude
 import           Language.Hakaru.Types.Sing
 import qualified System.Random.MWC                as MWC
