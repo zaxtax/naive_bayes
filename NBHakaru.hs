@@ -86,15 +86,15 @@ instance SV.Storable a => SV.Storable (ArrayType a) where
 labelHP :: Double
 labelHP = 1.0
 
-labelPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
-labelPrior k g = MWCD.dirichlet (V.generate k (const labelHP)) g
+labelPrior :: Int -> MWC.GenIO -> IO (V.Vector LF.LogFloat)
+labelPrior k g = fmap LF.logFloat <$> MWCD.dirichlet (V.generate k (const labelHP)) g
 
 -- this is \gamma_{\theta} in the Resnik & Hardisty paper
 vocabHP :: Double
 vocabHP = 1.0
 
-vocabPrior :: Int -> MWC.GenIO -> IO (V.Vector Double)
-vocabPrior v g = MWCD.dirichlet (V.generate v (const vocabHP)) g
+vocabPrior :: Int -> MWC.GenIO -> IO (V.Vector LF.LogFloat)
+vocabPrior v g = fmap LF.logFloat <$> MWCD.dirichlet (V.generate v (const vocabHP)) g
 
 type Label    = Int
 type Vocab    = M.Map T.Text Int
@@ -120,7 +120,7 @@ runner numDocs k vocabSize trial = do
          withVector (G.convert w) $ \w' ->
           withVector (G.convert doc) $ \doc' -> do
            r <- gibbsC vocabP' labelP' z' w' doc' 1
-           peek r >>= print-}
+           peek r >>= print
     sample <- time "" $ do
       printf "Haskell,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- G.map LF.logFloat <$> vocabPrior vocabSize g
@@ -130,12 +130,14 @@ runner numDocs k vocabSize trial = do
       printf "Haskell-Opt,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
-      print (G.length $ gibbsOpt (G.convert vocabP) (G.convert labelP) z w doc 1)
+      print (G.length $ gibbsOpt (G.convert vocabP) (G.convert labelP) z w doc 1)-}
     sample <- time "" $ do
       printf "Haskell-Opt-Bucket,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
-      print (G.length $ GibbsOptBucket.prog (G.convert vocabP) (G.convert labelP) z w doc 1)
+      Just _ <- flip unMeasure g $
+                     GibbsOptBucket.prog (G.convert vocabP) (G.convert labelP) z w doc 1
+      return ()
     return ()
   where doc :: MayBoxVec Int Int
         doc = G.concat $ map (G.replicate numDocs) [0..5] -- 300
