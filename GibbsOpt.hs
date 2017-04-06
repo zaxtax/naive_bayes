@@ -2,7 +2,7 @@
 module GibbsOpt where
 
 import           Prelude                          hiding (product)
-import           Language.Hakaru.Runtime.Prelude
+import           Language.Hakaru.Runtime.LogFloatPrelude
 import           Language.Hakaru.Types.Sing
 import qualified System.Random.MWC                as MWC
 import           Control.Monad
