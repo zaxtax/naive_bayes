@@ -1,7 +1,9 @@
+var theta[Ntopics], phi[Ntopics, Nvocab], z[Ndocs], w[Nwords];
+
 model {
     theta[1:Ntopics] ~ ddirch( onesTopics )
     for ( i in 1:Ntopics ) {
-      phi[i] ~ ddirch( onesVocab )
+      phi[i,] ~ ddirch( onesVocab )
     }
     
     for ( i in 1 : Ndocs ) {
