@@ -10,14 +10,20 @@ vocabSize <- length(unique(words))
 topicSize <- length(unique(topics))
 
 
-# Only hold onto docSize documents
-docSize <- 2000
-topics  <- topics[1:docSize]
-words   <- words[docs <= docSize]
+# Use docsPerTopic*topicSize documents
+docsPerTopic <- 100
+docIndices   <- c(sapply(0:(topicSize-1),
+                         function(i) (1000*i):(1000*i+docsPerTopic-1))) + 1
+topics       <- topics[docIndices]
+words        <- words[docs %in% docIndices]
+docs         <- as.numeric(as.factor(docs[docs %in% docIndices]))
 
-# Classify document 1190
-z1190_True <- topics[1190]
-topics[1190] <- NA
+# Classify 10 documents of each topic
+topicIndices <- c(sapply(0:(topicSize-1),
+                         function(i) (docsPerTopic*i):(docsPerTopic*i+10-1))) + 1
+
+zTrues <- topics[topicIndices]
+topics[topicIndices] <- NA
 
 jags <- jags.model('naive_bayes.jags',
                    data = list('Nwords'     = length(words),
@@ -37,15 +43,12 @@ start.time <- Sys.time()
 
 update(jags, 1);
 
-## coda.samples(jags,
-##              c('z', 'phi'),
-##              1)
-samples <- jags.samples(jags,
-                        c('z[1190]'),
-                        1);
+samples <- jags.samples(jags, c('z'), 1);
 
 end.time <- Sys.time()
 duration <- end.time - start.time
 # format(duration)
 cat("JAGS",format(duration), sep=",", fill=TRUE)
-cat(samples$"z[1190]", z1190_True, fill=TRUE)
+
+print(samples$"z"[topicIndices])
+print(zTrues)
