@@ -11,7 +11,7 @@ topicSize <- length(unique(topics))
 
 
 # Use docsPerTopic*topicSize documents
-docsPerTopic <- 100
+docsPerTopic <- 500
 docIndices   <- c(sapply(0:(topicSize-1),
                          function(i) (1000*i+1):(1000*i+docsPerTopic)))
 topics       <- topics[docIndices]
@@ -41,7 +41,7 @@ jags <- jags.model('naive_bayes.jags',
 
 start.time <- Sys.time()
 
-update(jags, 5);
+update(jags, 1);
 
 samples <- jags.samples(jags, c('z'), 1);
 zPredicts <- samples$"z"[topicIndices]
