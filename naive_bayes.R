@@ -10,8 +10,14 @@ vocabSize <- length(unique(words))
 topicSize <- length(unique(topics))
 
 
+args = commandArgs(trailingOnly=TRUE)
+if (length(args)==0) {
+  docsPerTopic <- 100
+} else {
+  docsPerTopic <- as.numeric(args[1])
+}
+
 # Use docsPerTopic*topicSize documents
-docsPerTopic   <- 100
 trainTestSplit <- 0.9
 docIndices     <- c(sapply(0:(topicSize-1),
                            function(i) (1000*i+1):(1000*i+docsPerTopic)))
