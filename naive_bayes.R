@@ -11,16 +11,18 @@ topicSize <- length(unique(topics))
 
 
 # Use docsPerTopic*topicSize documents
-docsPerTopic <- 1000
-docIndices   <- c(sapply(0:(topicSize-1),
-                         function(i) (1000*i+1):(1000*i+docsPerTopic)))
-topics       <- topics[docIndices]
-words        <- words[docs %in% docIndices]
-docs         <- as.numeric(as.factor(docs[docs %in% docIndices]))
+docsPerTopic   <- 100
+trainTestSplit <- 0.9
+docIndices     <- c(sapply(0:(topicSize-1),
+                           function(i) (1000*i+1):(1000*i+docsPerTopic)))
+topics         <- topics[docIndices]
+words          <- words[docs %in% docIndices]
+docs           <- as.numeric(as.factor(docs[docs %in% docIndices]))
 
-# Classify 10 documents of each topic
+testDocsPerTopic <- floor(docsPerTopic * trainTestSplit)
 topicIndices <- c(sapply(0:(topicSize-1),
-                         function(i) (docsPerTopic*i+1):(docsPerTopic*i+10)))
+                         function(i)
+                           (docsPerTopic*i+1):(docsPerTopic*i+testDocsPerTopic)))
 
 zTrues <- topics[topicIndices]
 topics[topicIndices] <- NA
