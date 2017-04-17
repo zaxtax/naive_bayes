@@ -19,7 +19,7 @@ topics         <- topics[docIndices]
 words          <- words[docs %in% docIndices]
 docs           <- as.numeric(as.factor(docs[docs %in% docIndices]))
 
-testDocsPerTopic <- floor(docsPerTopic * trainTestSplit)
+testDocsPerTopic <- floor(docsPerTopic * (1 - trainTestSplit))
 topicIndices <- c(sapply(0:(topicSize-1),
                          function(i)
                            (docsPerTopic*i+1):(docsPerTopic*i+testDocsPerTopic)))
