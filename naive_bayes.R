@@ -1,5 +1,5 @@
-library('rjags')
-library('coda')
+suppressMessages(library('rjags'))
+suppressMessages(library('coda'))
 
 load("20news.Rdata")
 topics <- topics + 1
