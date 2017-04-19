@@ -6,6 +6,8 @@ topics <- topics + 1
 words  <- words  + 1
 docs   <- docs   + 1
 
+trials <- 10
+
 vocabSize <- length(unique(words))
 topicSize <- length(unique(topics))
 
