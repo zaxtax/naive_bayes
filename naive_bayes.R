@@ -6,18 +6,17 @@ topics <- topics + 1
 words  <- words  + 1
 docs   <- docs   + 1
 
-trials <- 10
-
 vocabSize <- length(unique(words))
 topicSize <- length(unique(topics))
 
 
 args = commandArgs(trailingOnly=TRUE)
-if (length(args)==0) {
-  docsPerTopic <- 100
+if (length(args) != 2) {
+  cat("naive_bayes.R <docsPerTopic> <trial>\n")
 } else {
-  docsPerTopic <- as.numeric(args[1])
-}
+
+docsPerTopic <- as.numeric(args[1])
+trial        <- as.numeric(args[2])
 
 # Use docsPerTopic*topicSize documents
 trainTestSplit <- 0.9
@@ -62,8 +61,15 @@ end.time <- Sys.time()
 duration  <- end.time - start.time
 duration2 <- end.time - start2.time
 # format(duration)
-cat("JAGS",format(duration), format(duration2), sep=",", fill=TRUE)
+cat("JAGS",
+    format(duration),
+    format(duration2),
+    format(trial),
+    sep=",",
+    fill=TRUE)
 
 print(zPredicts)
 print(zTrues)
 print(length(zTrues[zPredicts == zTrues])/length(zTrues))
+
+}
