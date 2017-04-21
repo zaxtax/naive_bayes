@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 suppressMessages(library('rjags'))
 suppressMessages(library('coda'))
 
@@ -58,18 +60,22 @@ samples <- jags.samples(jags, c('z'), 1);
 zPredicts <- samples$"z"[topicIndices]
 
 end.time <- Sys.time()
-duration  <- end.time - start.time
-duration2 <- end.time - start2.time
-# format(duration)
+duration  <- difftime(end.time, start.time,  units="sec")
+duration2 <- difftime(end.time, start2.time, units="sec")
+
+cat("JAGS_init",
+    as.numeric(duration),
+    format(trial),
+    sep=",",
+    fill=TRUE)
 cat("JAGS",
-    format(duration),
-    format(duration2),
+    as.numeric(duration2),
     format(trial),
     sep=",",
     fill=TRUE)
 
-print(zPredicts)
-print(zTrues)
-print(length(zTrues[zPredicts == zTrues])/length(zTrues))
+#print(zPredicts)
+#print(zTrues)
+#print(length(zTrues[zPredicts == zTrues])/length(zTrues))
 
 }
