@@ -1,11 +1,13 @@
 #!/bin/bash
 
-echo "Running Baseline"
-# ./nb
+echo "System,Time,Acc,DocSize,Trial" > nbtimes.csv
 
-echo "Running Gibbs updates"
-
-echo "Lang,Docs,Categories,Vocab,Trial,Time" > gibbstimes.csv
-for i in `seq 1 10`; do
-  ./NBHakaru 10 3 100 $i >> gibbstimes.csv
+for d in 100 400 700 1000
+do
+   echo "Training on 20*$d documents"
+   for i in $(seq 1 10)
+   do
+      echo "    trial $i"
+      ./naive_bayes.R $d $i >> nbtimes.csv
+   done
 done
