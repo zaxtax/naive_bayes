@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "System,Time,Acc,DocSize,Trial" > nbtimes.csv
+echo "System,Time,DocSize,Acc,Trial" > nbtimes.csv
 
 for d in 100 400 700 1000
 do
