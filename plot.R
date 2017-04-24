@@ -43,30 +43,11 @@ summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
     return(datac)
 }
 
-data2 <- summarySE(data, measurevar="Time", groupvars=c("System","DocSize"))
-
-p <- ggplot(data2, aes(x=DocSize, y=Time, colour=System, group=System)) + 
-        geom_errorbar(aes(ymin=Time-se, ymax=Time+se), colour="black", width=.1, position=pd) +
-        geom_line(position=pd) +
-        #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
-        xlab("Data size") +
-        ylab("Run time (secs)") +
-        geom_point(aes(shape=System), size=3) +
-        scale_shape(name="Inference method",    # Legend label, use darker colors
-                    breaks=c("JAGS_init", "JAGS"),
-                    labels=c("JAGS + initialization",
-                             "JAGS")) +
-        scale_color_hue(name="Inference method",    # Legend label, use darker colors
-                        breaks=c("JAGS_init", "JAGS"),
-                        labels=c("JAGS + initialization",
-                                 "JAGS"),
-                        l=40) +
-    
+theming <- theme_bw() +
         #ggtitle("Run times for Gaussian Mixture Model") +
         #expand_limits(x=0,y=0) +                        # Expand y range
         #scale_y_continuous(expand = c(0, 0), limits= c(0,4)) +
         ##scale_y_continuous(breaks=0:20*4) +         # Set tick every 4
-        theme_bw() +
     
         theme(panel.grid.major = element_line(colour = "black", size=0.15)) +
         theme(panel.grid.minor = element_blank()) +
@@ -84,6 +65,26 @@ p <- ggplot(data2, aes(x=DocSize, y=Time, colour=System, group=System)) +
     
         theme(legend.justification=c(0.02,1.0),
               legend.position=c(0.02,1.0))               # Position legend in bottom right
+
+data2 <- summarySE(data, measurevar="Acc", groupvars=c("System","DocSize"))
+
+p <- ggplot(data2, aes(x=DocSize, y=Acc, colour=System, group=System)) + 
+        geom_errorbar(aes(ymin=Acc-se, ymax=Acc+se), colour="black", width=.1, position=pd) +
+        geom_line(position=pd) +
+        #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
+        xlab("Data size") +
+        ylab("Accuracy") +
+        geom_point(aes(shape=System), size=3) +
+        scale_shape(name="Inference method",    # Legend label, use darker colors
+                    breaks=c("JAGS_init", "JAGS"),
+                    labels=c("JAGS + initialization",
+                             "JAGS")) +
+        scale_color_hue(name="Inference method",    # Legend label, use darker colors
+                        breaks=c("JAGS_init", "JAGS"),
+                        labels=c("JAGS + initialization",
+                                 "JAGS"),
+                        l=40) +
+        theming   
 
 # ggsave("gmm_plot_cm.pdf", p) # width=4, height=3.5)
 # embed_fonts("gmm_plot_cm.pdf", outfile="gmmplot.pdf")
