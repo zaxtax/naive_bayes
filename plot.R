@@ -1,8 +1,8 @@
 library(ggplot2)
-#library(extrafont)
+library(extrafont)
 
-#loadfonts()
-dataFile <- "/home/zv/programming/research_projects/prob_prog_ppaml/naive_bayes/nbtimes.csv"
+loadfonts()
+dataFile <- "nbtimes.csv"
 data <- read.csv(dataFile, header=T)
 
 pd <- position_dodge(0.1)
@@ -53,7 +53,7 @@ theming <- theme_bw() +
         theme(panel.grid.minor = element_blank()) +
         theme(panel.grid.major.x = element_blank()) +
         theme(panel.border = element_rect(colour = "black", fill=NA, size=1)) +
-        #theme(text = element_text(family="CM Roman")) +
+        theme(text = element_text(family="CM Roman")) +
         theme(plot.title = element_text(size = rel(2))) +
         theme(axis.title.y = element_text(size = rel(1.5), angle = 90)) +
         theme(axis.title.x = element_text(size = rel(1.5))) +
@@ -67,7 +67,6 @@ theming <- theme_bw() +
               legend.position=c(0.02,1.0))               # Position legend in bottom right
 
 dataAcc <- summarySE(data, measurevar="Acc", groupvars=c("System","DocSize"))
-
 pAcc <- ggplot(dataAcc, aes(x=DocSize, y=Acc, colour=System, group=System)) + 
         geom_errorbar(aes(ymin=Acc-se, ymax=Acc+se), colour="black", width=.1, position=pd) +
         geom_line(position=pd) +
@@ -85,6 +84,9 @@ pAcc <- ggplot(dataAcc, aes(x=DocSize, y=Acc, colour=System, group=System)) +
                                  "JAGS"),
                         l=40) +
         theming   
+
+ggsave("nb_plot_cm.pdf", pAcc) # width=4, height=3.5)
+embed_fonts("nb_plot_cm.pdf", outfile="nbplotacc.pdf")
 
 dataT <- summarySE(data, measurevar="Time", groupvars=c("System","DocSize"))
 pT <- ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) + 
@@ -106,5 +108,5 @@ pT <- ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
         theming   
 
 
-# ggsave("nb_plot_cm.pdf", pT) # width=4, height=3.5)
-# embed_fonts("nb_plot_cm.pdf", outfile="nbplot.pdf")
+ggsave("nb_plot_cm.pdf", pT) # width=4, height=3.5)
+embed_fonts("nb_plot_cm.pdf", outfile="nbplottimes.pdf")
