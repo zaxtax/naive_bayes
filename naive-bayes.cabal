@@ -16,16 +16,17 @@ executable naive-bayes
   main-is:             Baseline.hs
   -- other-modules:
   other-extensions:    OverloadedLists
-  build-depends:       base       >=4.7    && < 5.0,
-                       containers >=0.5.8,
-                       text       >=0.11   && < 1.3,
-                       vector     >=0.10,
-                       directory  >=1.2    && < 1.3,
-                       filepath   >=1.1,
-                       bytestring >=0.10,
-                       mwc-random >=0.13,
-                       text-icu   >=0.7,
-                       hakaru     >=0.3,
+  build-depends:       base                 >=4.7    && < 5.0,
+                       containers           >=0.5.8,
+                       unordered-containers,
+                       text                 >=0.11   && < 1.3,
+                       vector               >=0.10,
+                       directory            >=1.2    && < 1.3,
+                       filepath             >=1.1,
+                       bytestring           >=0.10,
+                       mwc-random           >=0.13,
+                       text-icu             >=0.7,
+                       hakaru               >=0.4,
                        time
   -- hs-source-dirs:
   default-language:    Haskell2010
