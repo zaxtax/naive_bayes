@@ -1,4 +1,5 @@
 library(ggplot2)
+library(plyr)
 library(extrafont)
 
 loadfonts()
@@ -7,9 +8,9 @@ data <- read.csv(dataFile, header=T)
 
 pd <- position_dodge(0.1)
 
+# summarySE from http://www.cookbook-r.com/Manipulating_data/Summarizing_data/
 summarySE <- function(data=NULL, measurevar, groupvars=NULL, na.rm=FALSE,
                       conf.interval=.95, .drop=TRUE) {
-    library(plyr)
 
     # New version of length which can handle NA's: if na.rm==T, don't count them
     length2 <- function (x, na.rm=FALSE) {
