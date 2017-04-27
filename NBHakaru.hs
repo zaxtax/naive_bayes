@@ -9,7 +9,6 @@ module Main where
 import           Prelude                          hiding (product, exp, log, (**))
 import           Language.Hakaru.Runtime.LogFloatPrelude
 import           Language.Hakaru.Types.Sing
-import           System.CPUTime
 import           Data.Time.Clock
 import           System.Environment
 import           System.IO.Unsafe
