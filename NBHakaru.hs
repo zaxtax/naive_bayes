@@ -109,17 +109,16 @@ runner
 runner numDocs k vocabSize trial = do
     g      <- MWC.createSystemRandom
     Just (z, w) <- unMeasure (generateDataset k vocabSize numDocs doc) g
---    sample <- time "" $ do
---      printf "C,%d,%d,%d,%d,\n" numDocs k vocabSize trial
---      vocabP <- G.map LF.logFromLogFloat <$> vocabPrior vocabSize g
---      labelP <- G.map LF.logFromLogFloat <$> labelPrior k g
---      withVector (G.convert vocabP) $ \vocabP' ->
---       withVector (G.convert labelP) $ \labelP' ->
---        withVector (G.convert z) $ \z' ->
---         withVector (G.convert w) $ \w' ->
---          withVector (G.convert doc) $ \doc' -> do
---           r <- gibbsC vocabP' labelP' z' w' doc' 1
---           peek r >>= print
+    sample <- time "" $ do
+      printf "C,%d,%d,%d,%d,\n" numDocs k vocabSize trial
+      vocabP <- G.map LF.logFromLogFloat <$> vocabPrior vocabSize g
+      labelP <- G.map LF.logFromLogFloat <$> labelPrior k g
+      withVector (G.convert vocabP) $ \vocabP' ->
+       withVector (G.convert labelP) $ \labelP' ->
+        withVector (G.convert z) $ \z' ->
+         withVector (G.convert w) $ \w' ->
+          withVector (G.convert doc) $ \doc' -> do
+           gibbsC vocabP' labelP' z' w' doc' 1
     sample <- time "" $ do
       printf "Haskell,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
