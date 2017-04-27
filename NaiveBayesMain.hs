@@ -4,6 +4,7 @@ import           Control.Monad              (forever, replicateM, forM_)
 import qualified Data.ByteString.Char8 as B
 import           Data.List                  (sort)
 import           Data.Number.LogFloat
+import           Data.Time.Clock
 import qualified Data.Vector.Unboxed   as V
 import           Data.Vector.Unboxed        (Vector, (!))
 import           GibbsOptBucket             (prog)
@@ -13,6 +14,9 @@ import           News                       (getNews)
 import           System.Environment         (getArgs)
 import qualified System.Random.MWC as MWC
 import           Text.Printf                (printf)
+
+diff :: UTCTime -> UTCTime -> String
+diff t1 t2 = filter (/= 's') $ show (diffUTCTime t2 t1)
 
 onesFrom :: Vector Int -> Vector LogFloat
 onesFrom v = V.replicate (V.maximum v + 1) 1
@@ -49,27 +53,31 @@ main = do
          g <- MWC.createSystemRandom
          let numTopics        = 20
              trainTestSplit   = 0.9
-             testDocsPerTopic = floor (fromIntegral docsPerTopic *
-                                       (1.0 - trainTestSplit))
+             testDocsPerTopic = ceiling (fromIntegral docsPerTopic *
+                                         (1.0 - trainTestSplit))
              topicIndices     = getTopicIndices
                                   testDocsPerTopic
                                   docsPerTopic
-                                  topics
                                   numTopics
 
              zTrues  = V.map (topics !) topicIndices
-         zInits  <- initializeZs (testDocsPerTopic * numTopics) numTopics g
+         zInits  <- initializeZs (V.length topicIndices) numTopics g
          let topics' = V.update_ topics topicIndices zInits
              zPrior  = onesFrom topics
              wPrior  = onesFrom words
              predict = prog zPrior wPrior topics' words docs
+         t1 <- getCurrentTime
          zPreds <- V.forM topicIndices $ \i -> sample g (predict i)
+         t2 <- getCurrentTime
+         print topics
+         print topics'
          print zTrues
          print zPreds
+         putStrLn (diff t1 t2)
          print $ accuracy zTrues zPreds
 
-getTopicIndices testDocsPerTopic docsPerTopic topics numTopics =
+getTopicIndices testDocsPerTopic docsPerTopic numTopics =
     V.concatMap
-         (\i -> V.generate (testDocsPerTopic + 1) (+ i))
+         (\i -> V.generate testDocsPerTopic (+ i))
          seq
     where seq = V.generate numTopics (* docsPerTopic)
