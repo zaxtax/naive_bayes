@@ -25,6 +25,9 @@ nb_simp.c: nb_simp.hk
 clean:
 	rm NBHakaru nb *.o *.hi nb_simp.hk nb_simp.c *.core
 
+distclean : clean
+	rm -rf 20news-19997.tar.gz 20_newsgroups
+
 run:
 	sh run.sh
 	Rscript naive_bayes.R
