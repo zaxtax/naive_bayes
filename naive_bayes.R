@@ -20,14 +20,19 @@ if (length(args) != 2) {
 docsPerTopic <- as.numeric(args[1])
 trial        <- as.numeric(args[2])
 
-# Use docsPerTopic*topicSize documents
-trainTestSplit <- 0.9
+## Use docsPerTopic*topicSize documents
+
+# Take a subset of the dataset so we have
+# docsPerTopic for each newsgroup
 docIndices     <- c(sapply(0:(topicSize-1),
                            function(i) (1000*i+1):(1000*i+docsPerTopic)))
 topics         <- topics[docIndices]
 words          <- words[docs %in% docIndices]
 docs           <- as.numeric(as.factor(docs[docs %in% docIndices]))
 
+# We take a subset of the smaller dataset to use as
+# a test set
+trainTestSplit <- 0.9
 testDocsPerTopic <- floor(docsPerTopic * (1 - trainTestSplit))
 topicIndices <- c(sapply(0:(topicSize-1),
                          function(i)
