@@ -65,12 +65,13 @@ main = do
          let topics' = V.update_ topics topicIndices zInits
              zPrior  = onesFrom topics
              wPrior  = onesFrom words
-             predict = prog zPrior wPrior topics' words docs
          t1 <- getCurrentTime
-         zPreds <- V.forM topicIndices $ \i -> sample g (predict i)
+         topicsE <- V.foldM (\v i -> do
+                               let predict = prog zPrior wPrior v words docs
+                               z' <- sample g (predict i)
+                               return (v V.// [(i, z')])) topics' topicIndices
+         let zPreds = V.map (topicsE !) topicIndices
          t2 <- getCurrentTime
-         print topics
-         print topics'
          print zTrues
          print zPreds
          putStrLn (diff t1 t2)
