@@ -70,18 +70,12 @@ duration2 <- difftime(end.time, start2.time, units="sec")
 
 accuracy  <- length(zTrues[zPredicts == zTrues])/length(zTrues)
 
-cat("JAGS_init",
-    as.numeric(duration),
-    as.numeric(docsPerTopic*20),
-    format(accuracy),
-    format(trial),
-    sep=",",
-    fill=TRUE)
 cat("JAGS",
-    as.numeric(duration2),
     as.numeric(docsPerTopic*20),
-    format(accuracy),
     format(trial),
+    format(accuracy),
+    as.numeric(duration2),
+    as.numeric(duration),
     sep=",",
     fill=TRUE)
 
