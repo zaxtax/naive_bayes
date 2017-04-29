@@ -48,7 +48,7 @@ main = do
   case length args == 2 of
     False -> putStrLn "./naive-bayes <docsPerTopic≻ <trial>"
     True  -> do
-         let [docsPerTopic, trail] = map read args :: [Int]
+         let [docsPerTopic, trial] = map read args :: [Int]
          (words, docs, topics) <- getNews (Just docsPerTopic) [0..]
          g <- MWC.createSystemRandom
          let numTopics        = 20
@@ -72,10 +72,16 @@ main = do
                                return (v V.// [(i, z')])) topics' topicIndices
          let zPreds = V.map (topicsE !) topicIndices
          t2 <- getCurrentTime
-         print zTrues
-         print zPreds
-         putStrLn (diff t1 t2)
-         print $ accuracy zTrues zPreds
+         --print zTrues
+         --print zPreds
+
+         -- We don't print a newline as this will be called from a larger shell script
+         -- that needs to add another field
+         printf "Hakaru,%d,%d,%.6f,%s,"
+                    (docsPerTopic*numTopics)
+                    trial
+                    (accuracy zTrues zPreds)
+                    (diff t1 t2)
 
 getTopicIndices testDocsPerTopic docsPerTopic numTopics =
     V.concatMap
