@@ -78,7 +78,7 @@ main = do
          -- We don't print a newline as this will be called from a larger shell script
          -- that needs to add another field
          printf "Hakaru,%d,%d,%.6f,%s,"
-                    (docsPerTopic*numTopics)
+                    (V.length topics)
                     trial
                     (accuracy zTrues zPreds)
                     (diff t1 t2)
