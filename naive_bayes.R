@@ -33,7 +33,7 @@ docs           <- as.numeric(as.factor(docs[docs %in% docIndices]))
 # We take a subset of the smaller dataset to use as
 # a test set
 trainTestSplit <- 0.9
-testDocsPerTopic <- floor(docsPerTopic * (1 - trainTestSplit))
+testDocsPerTopic <- ceiling(docsPerTopic * (1 - trainTestSplit))
 topicIndices <- c(sapply(0:(topicSize-1),
                          function(i)
                            (docsPerTopic*i+1):(docsPerTopic*i+testDocsPerTopic)))
@@ -79,7 +79,7 @@ cat("JAGS",
     sep=",",
     fill=TRUE)
 
-#print(zPredicts)
-#print(zTrues)
+## print(zPredicts)
+## print(zTrues)
 
 }
