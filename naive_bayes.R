@@ -27,8 +27,10 @@ trial        <- as.numeric(args[2])
 docIndices     <- c(sapply(0:(topicSize-1),
                            function(i) (1000*i+1):(1000*i+docsPerTopic)))
 topics         <- topics[docIndices]
-words          <- words[docs %in% docIndices]
+words          <- as.numeric(as.factor(words[docs %in% docIndices]))
 docs           <- as.numeric(as.factor(docs[docs %in% docIndices]))
+
+vocabSize <- length(unique(words))
 
 # We take a subset of the smaller dataset to use as
 # a test set
