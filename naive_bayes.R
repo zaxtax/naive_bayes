@@ -8,10 +8,6 @@ topics <- topics + 1
 words  <- words  + 1
 docs   <- docs   + 1
 
-vocabSize <- length(unique(words))
-topicSize <- length(unique(topics))
-
-
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) != 2) {
   cat("naive_bayes.R <docsPerTopic> <trial>\n")
@@ -24,6 +20,8 @@ trial        <- as.numeric(args[2])
 
 # Take a subset of the dataset so we have
 # docsPerTopic for each newsgroup
+topicSize <- length(unique(topics))
+
 docIndices     <- c(sapply(0:(topicSize-1),
                            function(i) (1000*i+1):(1000*i+docsPerTopic)))
 topics         <- topics[docIndices]
