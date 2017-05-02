@@ -12,6 +12,7 @@ words  <- words  + 1
 docs   <- docs   + 1
 
 invisible(assert_that(ascending(topics)))
+invisible(assert_that(ascending(docs)))
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) != 2) {
