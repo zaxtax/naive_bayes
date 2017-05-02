@@ -2,11 +2,16 @@
 
 suppressMessages(library('rjags'))
 suppressMessages(library('coda'))
+suppressMessages(library('assertthat'))
+
+ascending <- function (x) all(diff(x) >= 0)
 
 load("20news.Rdata")
 topics <- topics + 1
 words  <- words  + 1
 docs   <- docs   + 1
+
+invisible(assert_that(ascending(topics)))
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) != 2) {
