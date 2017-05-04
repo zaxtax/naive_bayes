@@ -6,13 +6,9 @@ suppressMessages(library('assertthat'))
 
 ascending <- function (x) all(diff(x) >= 0)
 
-load("20news.Rdata")
-topics <- topics + 1
-words  <- words  + 1
-docs   <- docs   + 1
-
-invisible(assert_that(ascending(topics)))
-invisible(assert_that(ascending(docs)))
+scan.file <- function (f, suffix) {
+    scan(paste(f, suffix, sep="."), quiet=TRUE) + 1
+}
 
 args = commandArgs(trailingOnly=TRUE)
 if (length(args) != 2) {
@@ -22,18 +18,14 @@ if (length(args) != 2) {
 docsPerTopic <- as.numeric(args[1])
 trial        <- as.numeric(args[2])
 
-## Use docsPerTopic*topicSize documents
+topics <- scan.file("topics", docsPerTopic)
+words  <- scan.file("words",  docsPerTopic)
+docs   <- scan.file("docs",   docsPerTopic)
 
-# Take a subset of the dataset so we have
-# docsPerTopic for each newsgroup
+invisible(assert_that(ascending(topics)))
+invisible(assert_that(ascending(docs)))
+
 topicSize <- length(unique(topics))
-
-docIndices     <- c(sapply(0:(topicSize-1),
-                           function(i) (1000*i+1):(1000*i+docsPerTopic)))
-topics         <- topics[docIndices]
-words          <- as.numeric(as.factor(words[docs %in% docIndices]))
-docs           <- as.numeric(as.factor(docs[docs %in% docIndices]))
-
 vocabSize <- length(unique(words))
 
 # We take a subset of the smaller dataset to use as

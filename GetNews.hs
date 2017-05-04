@@ -1,19 +1,19 @@
 module Main where
 
-import qualified Data.ByteString.Char8 as B
 import News (getNews)
-import qualified System.Random.MWC as MWC
-import qualified Data.Vector.Unboxed as V
-import Data.Vector.Unboxed ((!))
 import Text.Printf (printf)
 import GibbsOptBucket (prog)
 import Control.Monad (forever, replicateM, forM_)
+import qualified Data.ByteString.Char8 as B
 import Data.List (sort)
-import Data.Number.LogFloat
+import Data.Maybe
 import Data.Monoid
-import System.IO
+import Data.Number.LogFloat
+import Data.Vector.Unboxed ((!))
+import qualified Data.Vector.Unboxed as V
 import System.Environment
-
+import System.IO
+import qualified System.Random.MWC as MWC
 
 writeVec :: String -> V.Vector Int -> IO ()
 writeVec file v = withFile file WriteMode $ \h -> do
@@ -25,7 +25,8 @@ main = do
     False -> putStrLn "./write-news <docsPerTopic≻"
     True  -> do
       let suffix = "." <> head args
-      (words, docs, topics) <- getNews (Just 10) [0..]
+      let docsPerTopic = fmap read (listToMaybe args)
+      (words, docs, topics) <- getNews docsPerTopic [0..]
       writeVec ("words"  <> suffix) words
       writeVec ("docs"   <> suffix) docs
       writeVec ("topics" <> suffix) topics
