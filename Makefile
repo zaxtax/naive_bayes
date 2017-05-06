@@ -6,12 +6,14 @@ all: data-file nb_simp.hk nb_simp.c
 	summary nb_simp.hk -o GibbsOptBucket.hs -M GibbsOptBucket --logfloat-prelude
 	ghc -O2 gibbs.o --make NBHakaru.hs # Haskell and C
 	ghc Baseline.hs -O2 -o nb # Baseline
+	ghc -O2 NaiveBayesMain.hs -o NaiveBayes
 
 all-sandbox: data-file nb_simp.hk nb_simp.c
 	#gcc -O3 -g -c gibbs.c
 	summary nb_simp.hk -o GibbsOptBucket.hs -M GibbsOptBucket --logfloat-prelude
 	ghc -O2 gibbs.o $(SANDBOX_OPTIONS) NBHakaru.hs # Haskell and C
 	ghc Baseline.hs -O2 $(SANDBOX_OPTIONS) -o nb # Baseline
+	ghc -O2 NaiveBayesMain.hs $(SANDBOX_OPTIONS) -o NaiveBayes
 
 data-file:
 	bash ./download-data.sh
@@ -23,9 +25,9 @@ nb_simp.c: nb_simp.hk
 	hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
 
 clean:
-	rm NBHakaru nb *.o *.hi nb_simp.hk nb_simp.c *.core
+	rm NBHakaru nb *.o *.hi nb_simp.hk nb_simp.c *.core NaiveBayes
 
-distclean : clean
+distclean: clean
 	rm -rf 20news-19997.tar.gz 20_newsgroups
 
 run:
