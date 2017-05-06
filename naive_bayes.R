@@ -3,6 +3,7 @@
 suppressMessages(library('rjags'))
 suppressMessages(library('coda'))
 suppressMessages(library('assertthat'))
+suppressMessages(library('MASS'))
 
 ascending <- function (x) all(diff(x) >= 0)
 
@@ -30,7 +31,7 @@ vocabSize <- length(unique(words))
 
 # We take a subset of the smaller dataset to use as
 # a test set
-trainTestSplit <- 0.9
+trainTestSplit <- fractions(9/10)
 testDocsPerTopic <- ceiling(docsPerTopic * (1 - trainTestSplit))
 topicIndices <- c(sapply(0:(topicSize-1),
                          function(i)
