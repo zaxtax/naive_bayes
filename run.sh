@@ -8,6 +8,8 @@ do
    for i in $(seq 1 10)
    do
       echo "    trial $i"
+      ghc -O2 GetNews.hs
+      ./GetNews $i
       ./naive_bayes.R $d $i >> nbtimes.csv
    done
 done
