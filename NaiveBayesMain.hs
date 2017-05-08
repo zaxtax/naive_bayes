@@ -52,9 +52,9 @@ main = do
          (words, docs, topics) <- getNews (Just docsPerTopic) [0..]
          g <- MWC.createSystemRandom
          let numTopics        = 20
-             trainTestSplit   = 0.9
+             trainTestSplit   = 9/10
              testDocsPerTopic = ceiling (fromIntegral docsPerTopic *
-                                         (1.0 - trainTestSplit))
+                                         (1 - trainTestSplit))
              topicIndices     = getTopicIndices
                                   testDocsPerTopic
                                   docsPerTopic
