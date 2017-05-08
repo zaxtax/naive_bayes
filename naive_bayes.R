@@ -40,8 +40,6 @@ topicIndices <- c(sapply(0:(topicSize-1),
 zTrues <- topics[topicIndices]
 topics[topicIndices] <- NA
 
-start.time <- Sys.time()
-
 jags <- jags.model('naive_bayes.jags',
                    data = list('Nwords'     = length(words),
                                'Ndocs'      = length(topics),
@@ -56,27 +54,25 @@ jags <- jags.model('naive_bayes.jags',
                    n.adapt = 10,
                    quiet=TRUE)
 
-start2.time <- Sys.time()
+start.time <- Sys.time()
 
 update(jags, 1);
 
 samples <- jags.samples(jags, c('z'), 1);
 zPredicts <- samples$"z"[topicIndices]
 
-end.time  <- Sys.time()
-duration  <- difftime(end.time, start.time,  units="sec")
-duration2 <- difftime(end.time, start2.time, units="sec")
+end.time <- Sys.time()
+duration <- difftime(end.time, start.time, units="sec")
 
-accuracy  <- length(zTrues[zPredicts == zTrues])/length(zTrues)
+accuracy <- length(zTrues[zPredicts == zTrues])/length(zTrues)
 
 cat("JAGS",
     as.numeric(docsPerTopic*20),
     format(trial),
     format(accuracy),
-    as.numeric(duration2),
     as.numeric(duration),
-    sep=",",
-    fill=TRUE)
+    sep=",")
+cat(",")
 
 ## print(zPredicts)
 ## print(zTrues)
