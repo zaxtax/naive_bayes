@@ -8,10 +8,6 @@ do
    for i in $(seq 1 10)
    do
       echo "    trial $i"
-      start=`date +%s.%N`
-      ./GetNews $i
-      ./naive_bayes.R $d $i >> nbtimes.csv
-      end=`date +%s.%N`
-      echo "$end - $start" | bc -l >> nbtimes.csv
+      ./naive_bayes.sh $d $i > nbtimes.csv
    done
 done
