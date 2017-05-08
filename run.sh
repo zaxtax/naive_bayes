@@ -8,6 +8,6 @@ do
    for i in $(seq 1 10)
    do
       echo "    trial $i"
-      ./naive_bayes.sh $d $i > nbtimes.csv
+      ./naive_bayes.sh $d $i >> nbtimes.csv
    done
 done
