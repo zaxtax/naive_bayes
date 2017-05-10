@@ -47,11 +47,11 @@ theming <- theme_bw() +
         theme(panel.border = element_rect(colour = "black", fill=NA, size=1)) +
         theme(text = element_text(family="Times")) +
         theme(plot.title = element_text(size = rel(2))) +
-        theme(plot.margin = margin(0.5, 1, 0.5, 1, "cm")) +
+        #theme(plot.margin = margin(0.5, 1, 0.5, 1, "cm")) +
         theme(axis.title.y = element_text(size = rel(1.5), angle = 90)) +
         theme(axis.title.x = element_text(size = rel(1.5))) +
         theme(axis.text.y = element_text(size = rel(1.5), angle = 90)) +
-        theme(axis.text.x = element_text(size = rel(1.5))) +
+        theme(axis.text.x = element_text(size = rel(1.5), hjust = 1)) +
         theme(legend.title = element_text(size = rel(1.5))) +
         theme(legend.text = element_text(size = rel(1.3))) +
         theme(legend.background = element_rect(fill = "transparent")) +
@@ -64,11 +64,11 @@ pAcc <- ggplot(data, aes(x=DocSize, y=Acc, colour=System, group=System)) +
                       colour="black", width=.1, position=pd) +
         geom_line(position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
-        xlab("Data size") +
-        ylab("Accuracy") +
+        xlab("Data size (documents)") +
+        ylab("Accuracy (%)") +
         geom_point(aes(shape=System), size=3) +
-        scale_shape(name="System") +
-        scale_color_hue(name="System", l=40) +
+        scale_shape(name="") +
+        scale_color_hue(name="", l=40) +
         scale_x_continuous(expand = c(0, 0)) +
         scale_y_continuous(expand = c(0, 0),
                            limits = c(0, 0.9)) +
@@ -82,8 +82,8 @@ pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
                     colour="black", width=.1, position=pd) +
         geom_line(position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
-        xlab("Data size") +
-        ylab("Run time (secs)") +
+        xlab("Data size (documents)") +
+        ylab("Run time (seconds)") +
         geom_point(aes(shape=System), size=3) +
         scale_shape(name="",    # Legend label, use darker colors
                     breaks=c("JAGS.Init.time", "JAGS.Update.time",
