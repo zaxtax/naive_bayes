@@ -47,7 +47,7 @@ theming <- theme_bw() +
         theme(panel.border = element_rect(colour = "black", fill=NA, size=1)) +
         theme(text = element_text(family="Times")) +
         theme(plot.title = element_text(size = rel(2))) +
-        theme(plot.margin = margin(1,1,1,1,"cm")) +
+        theme(plot.margin = margin(0.5, 1, 0.5, 1, "cm")) +
         theme(axis.title.y = element_text(size = rel(1.5), angle = 90)) +
         theme(axis.title.x = element_text(size = rel(1.5))) +
         theme(axis.text.y = element_text(size = rel(1.5), angle = 90)) +
@@ -85,14 +85,14 @@ pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
         xlab("Data size") +
         ylab("Run time (secs)") +
         geom_point(aes(shape=System), size=3) +
-        scale_shape(name="Inference method",    # Legend label, use darker colors
+        scale_shape(name="",    # Legend label, use darker colors
                     breaks=c("JAGS.Init.time", "JAGS.Update.time",
                              "Hakaru.Init.time", "Hakaru.Update.time"),
                     labels=c("JAGS + initialization",
                              "JAGS",
                              "Hakaru + initialization",
                              "Hakaru")) +
-        scale_color_hue(name="Inference method",    # Legend label, use darker colors
+        scale_color_hue(name="",    # Legend label, use darker colors
                         breaks=c("JAGS.Init.time", "JAGS.Update.time",
                                  "Hakaru.Init.time", "Hakaru.Update.time"),
                         labels=c("JAGS + initialization",
