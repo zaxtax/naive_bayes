@@ -45,8 +45,9 @@ theming <- theme_bw() +
         theme(panel.grid.minor = element_blank()) +
         theme(panel.grid.major.x = element_blank()) +
         theme(panel.border = element_rect(colour = "black", fill=NA, size=1)) +
-        theme(text = element_text(family="CM Roman")) +
+        theme(text = element_text(family="Times")) +
         theme(plot.title = element_text(size = rel(2))) +
+        theme(plot.margin = margin(1,1,1,1,"cm")) +
         theme(axis.title.y = element_text(size = rel(1.5), angle = 90)) +
         theme(axis.title.x = element_text(size = rel(1.5))) +
         theme(axis.text.y = element_text(size = rel(1.5), angle = 90)) +
@@ -73,8 +74,8 @@ pAcc <- ggplot(data, aes(x=DocSize, y=Acc, colour=System, group=System)) +
                            limits = c(0, 0.9)) +
         theming   
 
-ggsave("nb_plot_cm.pdf", pAcc) # width=4, height=3.5)
-embed_fonts("nb_plot_cm.pdf", outfile="nbplotacc.pdf")
+ggsave("nb_plot.pdf", pAcc) # width=4, height=3.5)
+embed_fonts("nb_plot.pdf", outfile="nbplotacc.pdf")
 
 pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
         geom_errorbar(aes(ymin=Time-se, ymax=Time+se),
@@ -101,9 +102,9 @@ pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
                         l=40) +
         scale_x_continuous(expand = c(0, 0)) +
         scale_y_continuous(expand = c(0, 0),
-                           limits = c(0, 12000)) +
+                           limits = c(0, 10000)) +
         theming   
 
 
-ggsave("nb_plot_cm.pdf", pT) # width=4, height=3.5)
-embed_fonts("nb_plot_cm.pdf", outfile="nbplottimes.pdf")
+ggsave("nb_plot.pdf", pT) # width=4, height=3.5)
+embed_fonts("nb_plot.pdf", outfile="nbplottimes.pdf")
