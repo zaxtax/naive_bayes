@@ -4,7 +4,7 @@ library(dplyr)
 library(extrafont)
 
 suppressMessages(loadfonts())
-dataFile <- "nbtimes.csv"
+dataFile <- "nbtimes3.csv"
 data <- read.csv(dataFile, header=T)
 
 pd <- position_dodge(0.1)
@@ -68,6 +68,9 @@ pAcc <- ggplot(data, aes(x=DocSize, y=Acc, colour=System, group=System)) +
         geom_point(aes(shape=System), size=3) +
         scale_shape(name="System") +
         scale_color_hue(name="System", l=40) +
+        scale_x_continuous(expand = c(0, 0)) +
+        scale_y_continuous(expand = c(0, 0),
+                           limits = c(0, 0.9)) +
         theming   
 
 ggsave("nb_plot_cm.pdf", pAcc) # width=4, height=3.5)
@@ -82,14 +85,23 @@ pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
         ylab("Run time (secs)") +
         geom_point(aes(shape=System), size=3) +
         scale_shape(name="Inference method",    # Legend label, use darker colors
-                    breaks=c("JAGS.Init.time", "JAGS.Update.time"),
+                    breaks=c("JAGS.Init.time", "JAGS.Update.time",
+                             "Hakaru.Init.time", "Hakaru.Update.time"),
                     labels=c("JAGS + initialization",
-                             "JAGS")) +
+                             "JAGS",
+                             "Hakaru + initialization",
+                             "Hakaru")) +
         scale_color_hue(name="Inference method",    # Legend label, use darker colors
-                        breaks=c("JAGS_init", "JAGS"),
+                        breaks=c("JAGS.Init.time", "JAGS.Update.time",
+                                 "Hakaru.Init.time", "Hakaru.Update.time"),
                         labels=c("JAGS + initialization",
-                                 "JAGS"),
+                                 "JAGS",
+                                 "Hakaru + initialization",
+                                 "Hakaru"),
                         l=40) +
+        scale_x_continuous(expand = c(0, 0)) +
+        scale_y_continuous(expand = c(0, 0),
+                           limits = c(0, 12000)) +
         theming   
 
 
