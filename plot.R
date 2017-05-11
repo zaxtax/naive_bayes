@@ -4,7 +4,7 @@ library(dplyr)
 library(extrafont)
 
 suppressMessages(loadfonts())
-dataFile <- "nbtimes3.csv"
+dataFile <- "nbtimes.csv"
 data <- read.csv(dataFile, header=T)
 
 pd <- position_dodge(0.1)
