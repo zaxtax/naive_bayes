@@ -77,6 +77,13 @@ pAcc <- ggplot(data, aes(x=DocSize, y=Acc, colour=System, group=System)) +
 ggsave("nb_plot.pdf", pAcc) # width=4, height=3.5)
 embed_fonts("nb_plot.pdf", outfile="nbplotacc.pdf")
 
+timing.fields = c("JAGS.Init.time", "JAGS.Update.time",
+                  "Hakaru.Init.time", "Hakaru.Update.time")
+timing.labels = c("JAGS + initialization",
+                  "JAGS",
+                  "Hakaru + initialization",
+                  "Hakaru")
+
 pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
         geom_errorbar(aes(ymin=Time-se, ymax=Time+se),
                     colour="black", width=.1, position=pd) +
@@ -86,19 +93,11 @@ pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
         ylab("Run time (seconds)") +
         geom_point(aes(shape=System), size=3) +
         scale_shape(name="",    # Legend label, use darker colors
-                    breaks=c("JAGS.Init.time", "JAGS.Update.time",
-                             "Hakaru.Init.time", "Hakaru.Update.time"),
-                    labels=c("JAGS + initialization",
-                             "JAGS",
-                             "Hakaru + initialization",
-                             "Hakaru")) +
+                    breaks=timing.fields,
+                    labels=timing.labels) +
         scale_color_hue(name="",    # Legend label, use darker colors
-                        breaks=c("JAGS.Init.time", "JAGS.Update.time",
-                                 "Hakaru.Init.time", "Hakaru.Update.time"),
-                        labels=c("JAGS + initialization",
-                                 "JAGS",
-                                 "Hakaru + initialization",
-                                 "Hakaru"),
+                        breaks=timing.fields,
+                        labels=timing.labels,
                         l=40) +
         scale_x_continuous(expand = c(0, 0)) +
         scale_y_continuous(expand = c(0, 0),
