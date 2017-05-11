@@ -67,18 +67,11 @@ main = do
              wPrior  = onesFrom words
          t1 <- getCurrentTime
          topicsE <- V.foldM (\v i -> do
-                               --print $ (map (printf "%2d" . (v !)) (V.toList topicIndices) :: [String])
                                let predict = prog zPrior wPrior v words docs
                                z' <- sample g (predict i)
                                return (v V.// [(i, z')])) topics' topicIndices
          let zPreds = V.map (topicsE !) topicIndices
-         --print $ (map (printf "%2d") (V.toList zPreds) :: [String])
          t2 <- getCurrentTime
-         --print (V.length topics)
-         --print zTrues
-         --print zPreds
-         --print (V.length docs)
-         --print (V.length words)
 
          -- We don't print a newline as this will be called from a larger shell script
          -- that needs to add another field
