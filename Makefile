@@ -20,6 +20,8 @@ data-file:
 
 nb_simp.hk:
 	simplify naive_bayes_gibbs.hk > nb_simp.hk
+	perl unsample.pl nb_simp.hk > nb_simp2.hk
+	mv nb_simp2.hk nb_simp.hk
 
 nb_simp.c: nb_simp.hk
 	hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
