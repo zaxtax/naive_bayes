@@ -32,7 +32,6 @@ distclean: clean
 
 run:
 	sh run.sh
-	Rscript naive_bayes.R
 
 %.hs : %.hk
 	compile $<
