@@ -75,7 +75,7 @@ pAcc <- ggplot(data, aes(x=DocSize, y=Acc, colour=System, group=System)) +
         theming   
 
 ggsave("nb_plot.pdf", pAcc) # width=4, height=3.5)
-embed_fonts("nb_plot.pdf", outfile="nbplotacc.pdf")
+embed_fonts("nb_plot.pdf", outfile="plots/nbplotacc.pdf")
 
 timing.fields = c("JAGS.Init.time", "JAGS.Update.time",
                   "Hakaru.Init.time", "Hakaru.Update.time")
@@ -106,4 +106,4 @@ pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
 
 
 ggsave("nb_plot.pdf", pT) # width=4, height=3.5)
-embed_fonts("nb_plot.pdf", outfile="nbplottimes.pdf")
+embed_fonts("nb_plot.pdf", outfile="plots/nbplottimes.pdf")
