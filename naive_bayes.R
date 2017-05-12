@@ -26,6 +26,7 @@ docs   <- scan.file("docs",   docsPerTopic)
 invisible(assert_that(ascending(topics)))
 invisible(assert_that(ascending(docs)))
 
+docsSize  <- length(topics)
 topicSize <- length(unique(topics))
 vocabSize <- length(unique(words))
 
@@ -42,7 +43,7 @@ topics[topicIndices] <- NA
 
 jags <- jags.model('naive_bayes.jags',
                    data = list('Nwords'     = length(words),
-                               'Ndocs'      = length(topics),
+                               'Ndocs'      = docsSize,
                                'Ntopics'    = topicSize,
                                'Nvocab'     = vocabSize,
                                'onesTopics' = rep(1,topicSize),
@@ -67,7 +68,7 @@ duration <- difftime(end.time, start.time, units="sec")
 accuracy <- length(zTrues[zPredicts == zTrues])/length(zTrues)
 
 cat("JAGS",
-    as.numeric(docsPerTopic*20),
+    as.numeric(docsSize),
     format(trial),
     format(accuracy),
     as.numeric(duration),
