@@ -1,4 +1,6 @@
 library(ggplot2)
+library(grid)
+
 library(tidyr)
 library(dplyr)
 library(extrafont)
@@ -44,7 +46,7 @@ theming <- theme_bw() +
         theme(panel.grid.major = element_line(colour = "black", size=0.15)) +
         theme(panel.grid.minor = element_blank()) +
         theme(panel.grid.major.x = element_blank()) +
-        theme(panel.border = element_rect(colour = "black", fill=NA, size=1)) +
+        theme(panel.border = element_rect(colour = "black", fill=NA, size=0.1)) +
         theme(text = element_text(family="Times")) +
         theme(plot.title = element_text(size = rel(2))) +
         #theme(plot.margin = margin(0.5, 1, 0.5, 1, "cm")) +
@@ -61,7 +63,7 @@ theming <- theme_bw() +
 
 pAcc <- ggplot(data, aes(x=DocSize, y=Acc, colour=System, group=System)) +
         geom_errorbar(aes(ymin=Acc-se, ymax=Acc+se),
-                      colour="black", width=.1, position=pd) +
+                      colour="black", width=200.1, position="dodge") +
         geom_line(position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
         xlab("Data size (documents)") +
@@ -74,7 +76,10 @@ pAcc <- ggplot(data, aes(x=DocSize, y=Acc, colour=System, group=System)) +
                            limits = c(0, 0.9)) +
         theming   
 
-ggsave("nb_plot.pdf", pAcc) # width=4, height=3.5)
+gAcc <- ggplot_gtable(ggplot_build(pAcc))
+gAcc$layout$clip[gAcc$layout$name=="panel"] <- "off"
+
+ggsave("nb_plot.pdf", gAcc) # width=4, height=3.5)
 embed_fonts("nb_plot.pdf", outfile="plots/nbplotacc.pdf")
 
 timing.fields = c("JAGS.Init.time", "JAGS.Update.time",
@@ -86,7 +91,7 @@ timing.labels = c("JAGS + initialization",
 
 pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
         geom_errorbar(aes(ymin=Time-se, ymax=Time+se),
-                    colour="black", width=.1, position=pd) +
+                    colour="black", width=0.1, position="dodge") +
         geom_line(position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
         xlab("Data size (documents)") +
@@ -103,8 +108,10 @@ pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
         scale_x_continuous(expand = c(0, 0)) +
         scale_y_continuous(expand = c(0, 0),
                           limits = c(0, 10000)) +
-        theming   
+        theming
 
+gT <- ggplot_gtable(ggplot_build(pT))
+gT$layout$clip[gT$layout$name=="panel"] <- "off"
 
-ggsave("nb_plot.pdf", pT) # width=4, height=3.5)
+ggsave("nb_plot.pdf", gT) # width=4, height=3.5)
 embed_fonts("nb_plot.pdf", outfile="plots/nbplottimes.pdf")
