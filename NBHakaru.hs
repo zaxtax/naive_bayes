@@ -118,23 +118,23 @@ runner numDocs k vocabSize trial = do
         withVector (G.convert z) $ \z' ->
          withVector (G.convert w) $ \w' ->
           withVector (G.convert doc) $ \doc' -> do
-           gibbsC vocabP' labelP' z' w' doc' 1
+           gibbsC labelP' vocabP' z' w' doc' 1
     sample <- time "" $ do
       printf "Haskell,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
-      print (G.length $ gibbs (G.convert vocabP) (G.convert labelP) z w doc 1)
+      print (G.length $ gibbs (G.convert labelP) (G.convert vocabP) z w doc 1)
     sample <- time "" $ do
       printf "Haskell-Opt,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
-      print (G.length $ gibbsOpt (G.convert vocabP) (G.convert labelP) z w doc 1)
+      print (G.length $ gibbsOpt (G.convert labelP) (G.convert vocabP) z w doc 1)
     sample <- time "" $ do
       printf "Haskell-Opt-Bucket,%d,%d,%d,%d,\n" numDocs k vocabSize trial
       vocabP <- vocabPrior vocabSize g
       labelP <- labelPrior k g
       Just _ <- flip unMeasure g $
-                     GibbsOptBucket.prog (G.convert vocabP) (G.convert labelP) z w doc 1
+                     GibbsOptBucket.prog (G.convert labelP) (G.convert vocabP) z w doc 1
       return ()
     return ()
   where doc :: MayBoxVec Int Int
