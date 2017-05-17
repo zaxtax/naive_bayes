@@ -92,16 +92,17 @@ pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
         xlab("Data size (documents)") +
         ylab("Run time (seconds)") +
         geom_point(aes(shape=System), size=3) +
-        scale_shape(name="",    # Legend label, use darker colors
-                    breaks=timing.fields,
-                    labels=timing.labels) +
+        scale_shape_manual(name="",    # Legend label, use darker colors
+                           breaks=timing.fields,
+                           labels=timing.labels,
+                           values = c(0,3,1,4)) +
         scale_color_hue(name="",    # Legend label, use darker colors
                         breaks=timing.fields,
                         labels=timing.labels,
                         l=40) +
         scale_x_continuous(expand = c(0, 0)) +
         scale_y_continuous(expand = c(0, 0),
-                           limits = c(0, 10000)) +
+                          limits = c(0, 10000)) +
         theming   
 
 
