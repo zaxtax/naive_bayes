@@ -63,12 +63,12 @@ theming <- theme_bw() +
 
 pAcc <- ggplot(data, aes(x=DocSize, y=Acc, colour=System, group=System)) +
         geom_errorbar(aes(ymin=Acc-se, ymax=Acc+se),
-                      colour="black", width=200.1, position="dodge") +
-        geom_line(position=pd) +
+                      colour="black", width=2000.1) +
+        geom_line(size=1.5, position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
         xlab("Data size (documents)") +
         ylab("Accuracy (%)") +
-        geom_point(aes(shape=System), size=3) +
+        geom_point(aes(shape=System), size=5) +
         scale_shape(name="") +
         scale_color_hue(name="", l=40) +
         scale_x_continuous(expand = c(0, 0)) +
@@ -92,16 +92,19 @@ timing.labels = c("JAGS + initialization",
 pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
         geom_errorbar(aes(ymin=Time-se, ymax=Time+se),
                     colour="black", width=0.1, position="dodge") +
-        geom_line(position=pd) +
+        geom_line(aes(linetype=System), size=1.5, position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
         xlab("Data size (documents)") +
         ylab("Run time (seconds)") +
-        geom_point(aes(shape=System), size=3) +
+        geom_point(aes(shape=System), size=5) +
         scale_shape_manual(name="",    # Legend label, use darker colors
                            breaks=timing.fields,
                            labels=timing.labels,
                            values = c(0,3,1,4)) +
-        #scale_linetype_manual(values=c("longdash", "solid", "longdash", "solid")) +
+        scale_linetype_manual(name="",    # Legend label, use darker colors
+                           breaks=timing.fields,
+                           labels=timing.labels,
+                              values=c("longdash", "solid", "longdash", "solid")) +
         scale_color_hue(name="",    # Legend label, use darker colors
                         breaks=timing.fields,
                         labels=timing.labels,
