@@ -61,16 +61,22 @@ theming <- theme_bw() +
         theme(legend.justification=c(0.02,1.0),
               legend.position=c(0.02,1.0))               # Position legend in bottom right
 
-pAcc <- ggplot(data, aes(x=DocSize, y=Acc, colour=System, group=System)) +
+pAcc <- ggplot(data, aes(x=DocSize,
+                         y=Acc,
+                         colour=System,
+                         shape=System,
+                         group=System)) +
         geom_errorbar(aes(ymin=Acc-se, ymax=Acc+se),
                       colour="black", width=2000.1) +
         geom_line(size=1.5, position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
         xlab("Data size (documents)") +
         ylab("Accuracy (%)") +
-        geom_point(aes(shape=System), size=5) +
+        geom_point(size=5) +
         scale_shape(name="") +
-        scale_color_hue(name="", l=40) +
+        #scale_color_hue(name="", l=40) +
+        scale_color_manual(name="",
+                           values=c("cornflowerblue", "firebrick2")) +
         scale_x_continuous(expand = c(0, 0)) +
         scale_y_continuous(expand = c(0, 0),
                            limits = c(0, 0.9)) +
@@ -89,29 +95,38 @@ timing.labels = c("JAGS + initialization",
                   "Hakaru + initialization",
                   "Hakaru")
 
-pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
+pT <-   ggplot(dataT, aes(x=DocSize,
+                          y=Time,
+                          colour=System,
+                          linetype=System,
+                          shape=System,
+                          group=System)) +
         geom_errorbar(aes(ymin=Time-se, ymax=Time+se),
                     colour="black", width=0.1, position="dodge") +
-        geom_line(aes(linetype=System), size=1.5, position=pd) +
+        geom_line(size=1.5, position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
         xlab("Data size (documents)") +
         ylab("Run time (seconds)") +
-        geom_point(aes(shape=System), size=5) +
+        geom_point(size=5) +
+        scale_linetype_manual(name="",    # Legend label, use darker colors
+                              breaks=timing.fields,
+                              labels=timing.labels,
+                              values=c("solid", "longdash", "solid", "dotted")) +
         scale_shape_manual(name="",    # Legend label, use darker colors
                            breaks=timing.fields,
                            labels=timing.labels,
-                           values = c(0,3,1,4)) +
-        scale_linetype_manual(name="",    # Legend label, use darker colors
+                           values=c(0,3,1,4)) +
+        scale_color_manual(name="",
                            breaks=timing.fields,
                            labels=timing.labels,
-                              values=c("longdash", "solid", "longdash", "solid")) +
-        scale_color_hue(name="",    # Legend label, use darker colors
-                        breaks=timing.fields,
-                        labels=timing.labels,
-                        l=40) +
-        scale_x_continuous(expand = c(0, 0)) +
-        scale_y_continuous(expand = c(0, 0),
-                          limits = c(0, 10000)) +
+                           values=c("cornflowerblue", "navyblue", "firebrick2", "red3")) +
+        ## scale_color_hue(name="",    # Legend label, use darker colors
+        ##                 breaks=timing.fields,
+        ##                 labels=timing.labels,
+        ##                 l=40) +
+        scale_x_continuous(expand=c(0, 0)) +
+        scale_y_continuous(expand=c(0, 0),
+                          limits=c(0, 10000)) +
         theming
 
 gT <- ggplot_gtable(ggplot_build(pT))
