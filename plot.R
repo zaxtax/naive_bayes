@@ -1,5 +1,6 @@
 library(ggplot2)
 library(grid)
+library(scales)
 
 library(tidyr)
 library(dplyr)
@@ -67,7 +68,7 @@ pAcc <- ggplot(data, aes(x=DocSize,
                          shape=System,
                          group=System)) +
         geom_errorbar(aes(ymin=Acc-se, ymax=Acc+se),
-                      colour="black", width=2000.1) +
+                      colour="black", width=2000) +
         geom_line(size=1.5, position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
         xlab("Data size (documents)") +
@@ -77,7 +78,9 @@ pAcc <- ggplot(data, aes(x=DocSize,
         #scale_color_hue(name="", l=40) +
         scale_color_manual(name="",
                            values=c("cornflowerblue", "firebrick2")) +
-        scale_x_continuous(expand=c(0, 0)) +
+        scale_x_continuous(expand=c(0, 0),
+                           limits=c(0, 20000),
+                           oob=rescale_none) +
         scale_y_continuous(expand=c(0, 0),
                            limits=c(0, 0.9)) +
         theming   
@@ -102,7 +105,7 @@ pT <-   ggplot(dataT, aes(x=DocSize,
                           shape=System,
                           group=System)) +
         geom_errorbar(aes(ymin=Time-se, ymax=Time+se),
-                    colour="black", width=0.1, position="dodge") +
+                    colour="black", position="dodge") +
         geom_line(size=1.5, position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
         xlab("Data size (documents)") +
