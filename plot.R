@@ -77,9 +77,9 @@ pAcc <- ggplot(data, aes(x=DocSize,
         #scale_color_hue(name="", l=40) +
         scale_color_manual(name="",
                            values=c("cornflowerblue", "firebrick2")) +
-        scale_x_continuous(expand = c(0, 0)) +
-        scale_y_continuous(expand = c(0, 0),
-                           limits = c(0, 0.9)) +
+        scale_x_continuous(expand=c(0, 0)) +
+        scale_y_continuous(expand=c(0, 0),
+                           limits=c(0, 0.9)) +
         theming   
 
 gAcc <- ggplot_gtable(ggplot_build(pAcc))
@@ -126,7 +126,7 @@ pT <-   ggplot(dataT, aes(x=DocSize,
         ##                 l=40) +
         scale_x_continuous(expand=c(0, 0)) +
         scale_y_continuous(expand=c(0, 0),
-                          limits=c(0, 10000)) +
+                           limits=c(0, 10000)) +
         theming
 
 gT <- ggplot_gtable(ggplot_build(pT))
