@@ -15,6 +15,10 @@ import           System.Environment         (getArgs)
 import qualified System.Random.MWC as MWC
 import           Text.Printf                (printf)
 
+iterateM2 :: Monad m => Int -> (a -> m a) -> a -> m a
+iterateM2 0 _ a = return a
+iterateM2 n f a = f a >>= iterateM2 (n - 1) f
+
 diff :: UTCTime -> UTCTime -> String
 diff t1 t2 = filter (/= 's') $ show (diffUTCTime t2 t1)
 
@@ -45,10 +49,10 @@ initializeZs testSize numTopics g =
 
 main = do
   args  <- getArgs
-  case length args == 2 of
-    False -> putStrLn "./naive-bayes <docsPerTopic≻ <trial>"
+  case length args == 3 of
+    False -> putStrLn "./naive-bayes <docsPerTopic≻ <sweeps> <trial>"
     True  -> do
-         let [docsPerTopic, trial] = map read args :: [Int]
+         let [docsPerTopic, sweeps, trial] = map read args :: [Int]
          (words, docs, topics) <- getNews (Just docsPerTopic) [0..]
          g <- MWC.createSystemRandom
          let numTopics        = 20
@@ -67,21 +71,21 @@ main = do
              wPrior  = onesFrom words
              -- predict = prog zPrior wPrior topics' words docs
          t1 <- getCurrentTime
-         topicsE <- V.foldM (\v i -> do
+         topicsE <- iterateM2 sweeps (\t ->
+                        V.foldM (\v i -> do
                                let predict = prog zPrior wPrior v words docs
                                z' <- sample g (predict i)
-                               return (v V.// [(i, z')])) topics' topicIndices
+                               return (v V.// [(i, z')])) t topicIndices) topics'
          let zPreds = V.map (topicsE !) topicIndices
          -- zPreds <- V.forM topicIndices $ \i -> sample g (predict i)
          t2 <- getCurrentTime
 
          -- We don't print a newline as this will be called from a larger shell script
          -- that needs to add another field
-         printf "Hakaru,%d,%d,%.6f,%s,"
+         printf "Hakaru,%d,%d,%.6f\n"
                     (V.length topics)
                     trial
                     (accuracy zTrues zPreds)
-                    (diff t1 t2)
 
 getTopicIndices testDocsPerTopic docsPerTopic numTopics =
     V.concatMap

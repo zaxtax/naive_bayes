@@ -101,6 +101,7 @@ pT <-   ggplot(dataT, aes(x=DocSize, y=Time, colour=System, group=System)) +
                            breaks=timing.fields,
                            labels=timing.labels,
                            values = c(0,3,1,4)) +
+        #scale_linetype_manual(values=c("longdash", "solid", "longdash", "solid")) +
         scale_color_hue(name="",    # Legend label, use darker colors
                         breaks=timing.fields,
                         labels=timing.labels,
