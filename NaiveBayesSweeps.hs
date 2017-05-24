@@ -82,8 +82,9 @@ main = do
 
          -- We don't print a newline as this will be called from a larger shell script
          -- that needs to add another field
-         printf "Hakaru,%d,%d,%.6f\n"
+         printf "Hakaru,%d,%d,%d,%.6f\n"
                     (V.length topics)
+                    sweeps
                     trial
                     (accuracy zTrues zPreds)
 

@@ -70,6 +70,7 @@ accuracy <- length(zTrues[zPredicts == zTrues])/length(zTrues)
 
 cat("JAGS",
     as.numeric(docsSize),
+    format(sweeps),
     format(trial),
     format(accuracy),
     sep=",",
