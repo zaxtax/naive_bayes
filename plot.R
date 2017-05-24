@@ -16,6 +16,8 @@ ci_calc <- function(sd, n, conf.lev = .95) {
     sd/sqrt(n) * qt(conf.lev/2 + .5, n - 1)
 }
 
+data$Acc <- data$Acc * 100
+
 dataT <- data %>%
     gather(Time.var, Time, Init.time, Update.time) %>%
     group_by(System,DocSize,Time.var) %>%
@@ -39,10 +41,9 @@ data <- data %>%
     rename(Acc=mean)
 
 theming <- theme_bw() +
-        #ggtitle("Run times for Gaussian Mixture Model") +
         #expand_limits(x=0,y=0) +                        # Expand y range
         #scale_y_continuous(expand = c(0, 0), limits= c(0,4)) +
-        ##scale_y_continuous(breaks=0:20*4) +         # Set tick every 4
+        #scale_y_continuous(breaks=0:20*4) +         # Set tick every 4
     
         theme(panel.grid.major = element_line(colour = "black", size=0.15)) +
         theme(panel.grid.minor = element_blank()) +
@@ -80,10 +81,10 @@ pAcc <- ggplot(data, aes(x=DocSize,
                            values=c("cornflowerblue", "firebrick2")) +
         scale_x_continuous(expand=c(0, 0),
                            limits=c(0, 20000),
-                           breaks=1:4*5000,
                            oob=rescale_none) +
         scale_y_continuous(expand=c(0, 0),
-                           limits=c(0, 0.9)) +
+                           breaks=1:3*25,
+                           limits=c(0, 90)) +
         theming   
 
 gAcc <- ggplot_gtable(ggplot_build(pAcc))
@@ -130,6 +131,7 @@ pT <-   ggplot(dataT, aes(x=DocSize,
         ##                 l=40) +
         scale_x_continuous(expand=c(0, 0)) +
         scale_y_continuous(expand=c(0, 0),
+                           breaks=1:5*2500,
                            limits=c(0, 10000)) +
         theming
 
