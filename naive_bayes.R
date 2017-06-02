@@ -57,8 +57,6 @@ jags <- jags.model('naive_bayes.jags',
 
 start.time <- Sys.time()
 
-update(jags, 1);
-
 samples <- jags.samples(jags, c('z'), 1);
 zPredicts <- samples$"z"[topicIndices]
 
