@@ -15,9 +15,9 @@ import           System.Environment         (getArgs)
 import qualified System.Random.MWC as MWC
 import           Text.Printf                (printf)
 
-iterateM2 :: Monad m => Int -> (a -> m a) -> a -> m a
+iterateM2 :: Monad m => Int -> (a -> Int -> m a) -> a -> m a
 iterateM2 0 _ a = return a
-iterateM2 n f a = f a >>= iterateM2 (n - 1) f
+iterateM2 n f a = f a (n - 1) >>= iterateM2 (n - 1) f
 
 diff :: UTCTime -> UTCTime -> String
 diff t1 t2 = filter (/= 's') $ show (diffUTCTime t2 t1)
@@ -70,24 +70,21 @@ main = do
              zPrior  = onesFrom topics
              wPrior  = onesFrom words
              -- predict = prog zPrior wPrior topics' words docs
-         t1 <- getCurrentTime
-         topicsE <- iterateM2 sweeps (\t ->
-                        V.foldM (\v i -> do
-                               let predict = prog zPrior wPrior v words docs
-                               z' <- sample g (predict i)
-                               return (v V.// [(i, z')])) t topicIndices) topics'
-         let zPreds = V.map (topicsE !) topicIndices
-         -- zPreds <- V.forM topicIndices $ \i -> sample g (predict i)
-         t2 <- getCurrentTime
 
-         -- We don't print a newline as this will be called from a larger shell script
-         -- that needs to add another field
-         printf "Hakaru,%d,%d,%.6f,%s,"
-                    (V.length topics)
-                    --sweeps
-                    trial
-                    (accuracy zTrues zPreds)
-                    (diff t1 t2)
+         iterateM2 sweeps (\t sI -> do
+           t' <- V.foldM (\v i -> do
+                   let predict = prog zPrior wPrior v words docs
+                   z' <- sample g (predict i)
+                   return (v V.// [(i, z')])) t topicIndices
+           let zPreds = V.map (t' !) topicIndices
+           printf "Hakaru,%d,%d,%d,%.6f\n"
+                      (V.length topics)
+                      (sweeps - sI)
+                      trial
+                      (accuracy zTrues zPreds)
+           return t') topics'
+         return ()
+         -- zPreds <- V.forM topicIndices $ \i -> sample g (predict i)
 
 getTopicIndices testDocsPerTopic docsPerTopic numTopics =
     V.concatMap
