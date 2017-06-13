@@ -52,7 +52,7 @@ jags <- jags.model('naive_bayes.jags',
                                'z'          = topics,
                                'w'          = words,
                                'doc'        = docs),
-                   n.chains = 1,
+                   n.chains = 40,
                    n.adapt = 10,
                    quiet=TRUE)
 
