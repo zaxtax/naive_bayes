@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euf -o pipefail
 
 echo "System,DocSize,Trial,Acc,Update.time,Init.time" > nbtimes.csv
 
