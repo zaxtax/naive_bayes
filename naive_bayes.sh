@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euf -o pipefail
 
 if [ "$#" -ne 2 ]; then
     echo "./naive_bayes.sh <docsPerTopic> <trial>"
