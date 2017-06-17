@@ -36,7 +36,7 @@ distclean: clean
 	rm -rf 20news-19997.tar.gz 20_newsgroups
 
 run:
-	sh run.sh
+	bash run.sh
 
 plot:
 	Rscript plot.R
