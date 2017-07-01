@@ -30,7 +30,7 @@ nb_simp.c: nb_simp.hk
 	hkc -F gibbsC -O nb_simp.hk -o nb_simp.c
 
 clean:
-	rm NBHakaru nb *.o *.hi nb_simp.hk nb_simp.c *.core NaiveBayes GetNews words.* docs.* topics.* plots/*.pdf
+	rm NBHakaru nb *.o *.hi nb_simp.hk nb_simp.c *.core NaiveBayes NaiveBayesSweeps GetNews words.* docs.* topics.* plots/*.pdf
 
 distclean: clean
 	rm -rf 20news-19997.tar.gz 20_newsgroups
