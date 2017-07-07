@@ -15,6 +15,8 @@ p <- ggplot(data2,
             aes(x=Sweeps, y=Accuracy, group=interaction(Chains, System), colour=System)) +
      geom_line(alpha=0.4) +
      guides(colour = guide_legend(override.aes = list(alpha = 1))) +
+     scale_color_manual(name="",
+                        values=c("cornflowerblue", "firebrick2")) +
      scale_x_continuous(expand=c(0, 0)) +
      scale_y_continuous(expand=c(0, 0)) +
      theme_bw() + 
