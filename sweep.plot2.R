@@ -1,9 +1,17 @@
 library('ggplot2')
+library('data.table')
+library('zoo')
 
-data <- read.csv("nbsweeps3.csv", header=T)
+data <- fread("nbsweeps.csv")
 data$Accuracy <- data$Accuracy * 100
 
-p <- ggplot(data,
+window.size <- 20
+
+dt <- data.table(data)
+dt[, Accuracy:=rollmean(Accuracy, window.size, fill=list(NA, NULL, NA)), by = "Chains,System"]
+data2 <- data.frame(dt)
+
+p <- ggplot(data2,
             aes(x=Sweeps, y=Accuracy, group=interaction(Chains, System), colour=System)) +
      geom_line(alpha=0.4) +
      guides(colour = guide_legend(override.aes = list(alpha = 1))) +
@@ -27,4 +35,4 @@ p <- ggplot(data,
            legend.position=c(0.85,0.15))               # Position legend in bottom right
 
 
-ggsave("plots/nbsweeps3.pdf", p)
+ggsave("plots/nbsweeps2.pdf", p)
