@@ -1,11 +1,14 @@
 library('ggplot2')
 
-data <- read.csv("nbsweeps.csv", header=T)
+data <- read.csv("nbsweeps3.csv", header=T)
+data$Accuracy <- data$Accuracy * 100
 
 p <- ggplot(data,
             aes(x=Sweeps, y=Accuracy, group=interaction(Chains, System), colour=System)) +
      geom_line(alpha=0.4) +
      guides(colour = guide_legend(override.aes = list(alpha = 1))) +
+     scale_x_continuous(expand=c(0, 0)) +
+     scale_y_continuous(expand=c(0, 0)) +
      theme_bw() + 
      theme(panel.grid.major = element_line(colour = "black", size=0.15)) +
      theme(panel.grid.minor = element_blank()) +
@@ -16,7 +19,7 @@ p <- ggplot(data,
      theme(axis.title.y = element_text(size = rel(1.5), angle = 90)) +
      theme(axis.title.x = element_text(size = rel(1.5))) +
      theme(axis.text.y = element_text(size = rel(1.5), angle = 90)) +
-     theme(axis.text.x = element_text(size = rel(1.5))) +
+     theme(axis.text.x = element_text(size = rel(1.5), hjust = 1)) +
      theme(legend.title = element_text(size = rel(1.5))) +
      theme(legend.text = element_text(size = rel(1.3))) +
      theme(legend.background = element_rect(fill = "transparent")) +
@@ -24,4 +27,4 @@ p <- ggplot(data,
            legend.position=c(0.85,0.15))               # Position legend in bottom right
 
 
-ggsave("plots/nbsweeps2.pdf", p)
+ggsave("plots/nbsweeps3.pdf", p)
