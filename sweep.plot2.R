@@ -2,7 +2,7 @@ library('ggplot2')
 library('data.table')
 library('zoo')
 
-data <- fread("nbsweeps.csv")
+data <- fread("nbsweeps3.csv")
 data$Accuracy <- data$Accuracy * 100
 
 window.size <- 20
@@ -35,4 +35,4 @@ p <- ggplot(data2,
            legend.position=c(0.85,0.15))               # Position legend in bottom right
 
 
-ggsave("plots/nbsweeps2.pdf", p)
+ggsave("plots/nbsweeps4.pdf", p)
