@@ -14,6 +14,7 @@ data2 <- data.frame(dt)
 p <- ggplot(data2,
             aes(x=Sweeps, y=Accuracy, group=interaction(Chains, System), colour=System)) +
      geom_line(alpha=0.4) +
+     ylab("Accuracy (%)") +
      guides(colour = guide_legend(override.aes = list(alpha = 1))) +
      scale_color_manual(name="",
                         values=c("cornflowerblue", "firebrick2")) +
