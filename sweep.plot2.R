@@ -24,13 +24,16 @@ p <- ggplot(data2,
      theme(panel.grid.major = element_line(colour = "black", size=0.15)) +
      theme(panel.grid.minor = element_blank()) +
      theme(panel.grid.major.x = element_blank()) +
-     theme(panel.border = element_rect(colour = "black", fill=NA, size=1)) +
+     theme(panel.border = element_blank()) + #rect(colour = "black", fill=NA, size=1)) +
+     theme(axis.line = element_line(colour = "black")) +
      theme(text = element_text(family="Times")) +
      theme(plot.title = element_text(size = rel(2))) +
      theme(axis.title.y = element_text(size = rel(1.5), angle = 90)) +
      theme(axis.title.x = element_text(size = rel(1.5))) +
      theme(axis.text.y = element_text(size = rel(1.5), angle = 90)) +
      theme(axis.text.x = element_text(size = rel(1.5), hjust = 1)) +
+     theme(strip.text.y = element_text(size = rel(2.5))) +
+     theme(panel.spacing = unit(2, "lines")) +
      theme(legend.title = element_text(size = rel(1.5))) +
      theme(legend.text = element_text(size = rel(1.3))) +
      theme(legend.background = element_rect(fill = "transparent")) +
