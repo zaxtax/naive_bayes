@@ -111,7 +111,7 @@ pT <-   ggplot(dataT, aes(x=DocSize,
         geom_line(size=1.5, position=pd) +
         #geom_point(position=pd, size=3, shape=21, fill="white") + # 21 is filled circle
         xlab("Data size (documents)") +
-        ylab("Run time (seconds)") +
+        ylab("Run time (secs)") +
         geom_point(size=5) +
         scale_linetype_manual(name="",    # Legend label, use darker colors
                               breaks=timing.fields,
