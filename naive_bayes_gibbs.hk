@@ -28,7 +28,7 @@ def naive_bayes( topic_prior array(prob)
             observe(categorical(theta), zz)
 
     w <~ plate n of size(w):   # word n
-            observer(categorical(phi[z[doc[n]]]), w[n])
+            observe(categorical(phi[z[doc[n]]]), w[n])
 
     return zNew
 
