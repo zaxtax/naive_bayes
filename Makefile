@@ -22,7 +22,7 @@ summary: nb_simp.hk
 	summary nb_simp.hk -o GibbsOptBucket.hs -M GibbsOptBucket --logfloat-prelude
 
 nb_simp.hk:
-	simplify naive_bayes_gibbs.hk > nb_simp.hk
+	hk-maple -c Simplify naive_bayes_gibbs.hk > nb_simp.hk
 	perl unsample.pl nb_simp.hk > nb_simp2.hk
 	mv nb_simp2.hk nb_simp.hk
 
